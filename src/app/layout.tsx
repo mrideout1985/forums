@@ -1,6 +1,7 @@
 import "@/sass/style.scss";
 
 import { TRPCReactProvider } from "@/trpc/react";
+import AppLayout from "./layouts/main/appLayout";
 
 export const metadata = {
   title: "Create T3 App",
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <AppLayout>{children}</AppLayout>
+        </TRPCReactProvider>
       </body>
     </html>
   );
