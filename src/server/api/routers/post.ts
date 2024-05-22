@@ -16,7 +16,7 @@ export const postRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    .input(z.object({ name: z.string().min(1), categoryId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       // simulate a slow db call
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -25,8 +25,27 @@ export const postRouter = createTRPCRouter({
         data: {
           name: input.name,
           createdBy: { connect: { id: ctx.session.user.id } },
+          category: { connect: { id: input.categoryId } },
         },
       });
+    }),
+
+  getPostById: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.db.post.findUnique({
+        where: { id: input.id },
+        include: {
+          category: true,
+          createdBy: true,
+        },
+      });
+
+      if (!post) {
+        throw new Error("Post not found");
+      }
+
+      return post;
     }),
 
   getLatest: protectedProcedure.query(({ ctx }) => {
@@ -34,6 +53,16 @@ export const postRouter = createTRPCRouter({
       orderBy: { createdAt: "desc" },
       where: { createdBy: { id: ctx.session.user.id } },
     });
+  }),
+
+  getAllPosts: publicProcedure.query(async ({ ctx }) => {
+    const posts = await ctx.db.post.findMany({
+      include: {
+        category: true,
+        createdBy: true,
+      },
+    });
+    return posts;
   }),
 
   getSecretMessage: protectedProcedure.query(() => {

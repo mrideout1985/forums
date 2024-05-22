@@ -32,9 +32,8 @@ model Post {
 }
 
 model Category {
-    id   Int    @id @default(autoincrement())
-    name String @unique
-
+    id    Int    @id @default(autoincrement())
+    name  String @unique
     posts Post[]
 }
 
@@ -85,6 +84,7 @@ model Notification {
     postId    Int
     message   String
     createdAt DateTime @default(now())
+    read      Boolean  @default(false) // New field to indicate if the notification is read
 }
 
 model VerificationToken {

@@ -78,6 +78,7 @@ async function main() {
       userId: existingUser.id,
       postId: post2.id,
       message: 'Your post "Forum Rules" has been created!',
+      read: false,
     },
   });
 
@@ -86,6 +87,7 @@ async function main() {
       userId: existingUser.id,
       postId: post3.id,
       message: 'Your post "How to get help" has been created!',
+      read: false,
     },
   });
 
