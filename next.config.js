@@ -1,16 +1,14 @@
 import path from "path";
+import { fileURLToPath } from "url";
 
-/**
- * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
- * for Docker builds.
- */
-await import("./src/env.js");
+// Get the current file URL and convert it to a path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-/** @type {import("next").NextConfig} */
-const config = {
+const nextConfig = {
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
 };
 
-export default config;
+export default nextConfig;

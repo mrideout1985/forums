@@ -1,0 +1,14 @@
+@use "../abstracts" as *;
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto&display=swap");
+
+body {
+  font-family: var(--ff-primary);
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.1;
+}

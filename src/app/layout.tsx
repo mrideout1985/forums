@@ -1,4 +1,4 @@
-import "@/styles/globals.css";
+import "@/sass/style.scss";
 
 import { TRPCReactProvider } from "@/trpc/react";
 
