@@ -1,0 +1,19 @@
+# Frontend .gitignore
+# This file specifies which files and directories should be excluded from version control.
+# For more information about .gitignore, see: https://git-scm.com/docs/gitignore
+
+# macOS
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+/node_modules/
+
+# React Router
+/.react-router/
+/build/
+

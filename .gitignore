@@ -4,6 +4,12 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Node modules (frontend and any Node projects)
+**/node_modules/
+package-lock.json
+
+/.github/instructions
+
 ### STS ###
 .apt_generated
 .classpath
@@ -31,3 +37,19 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Frontend build artifacts
+.react-router/
+frontend/build/
+
+# ESLint cache
+.eslintcache
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS-specific files
+.DS_Store
+Thumbs.db

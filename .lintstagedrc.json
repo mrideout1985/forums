@@ -1,0 +1,9 @@
+{
+  "*.{js,jsx,ts,tsx}": [
+    "cd frontend && npm run lint:fix",
+    "cd frontend && npm run format"
+  ],
+  "*.{json,css,scss,md}": [
+    "cd frontend && npm run format"
+  ]
+}
