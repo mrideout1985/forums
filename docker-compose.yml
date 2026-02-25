@@ -9,6 +9,19 @@ services:
       - "5432:5432"
     volumes:
       - forum_pg:/var/lib/postgresql/data
+  service:
+    build:
+      context: ./backend
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: forum
+      DB_USER: forum
+      DB_PASSWORD: forum
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
 
 volumes:
   forum_pg:

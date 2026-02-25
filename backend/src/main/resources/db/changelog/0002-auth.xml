@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="0003-add-auth-columns" author="mrideout">
+        <addColumn tableName="users">
+            <column name="password_hash" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="users">
+            <column name="is_active" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="0004-create-roles" author="mrideout">
+        <createTable tableName="roles">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="roles"
+                columnNames="name"
+                constraintName="uk_roles_name"/>
+    </changeSet>
+
+    <changeSet id="0005-create-user-roles" author="mrideout">
+        <createTable tableName="user_roles">
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+                tableName="user_roles"
+                columnNames="user_id,role_id"
+                constraintName="pk_user_roles"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_user_roles_user_id"
+                baseTableName="user_roles"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_user_roles_role_id"
+                baseTableName="user_roles"
+                baseColumnNames="role_id"
+                referencedTableName="roles"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="0006-insert-default-roles" author="mrideout">
+        <insert tableName="roles">
+            <column name="id" value="550e8400-e29b-41d4-a716-446655440001"/>
+            <column name="name" value="ROLE_USER"/>
+            <column name="description" value="Standard user role"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="550e8400-e29b-41d4-a716-446655440002"/>
+            <column name="name" value="ROLE_ADMIN"/>
+            <column name="description" value="Administrator role"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="550e8400-e29b-41d4-a716-446655440003"/>
+            <column name="name" value="ROLE_MODERATOR"/>
+            <column name="description" value="Moderator role"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
+
