@@ -4,9 +4,10 @@
   "private": true,
   "description": "Forums application monorepo with TypeScript frontend and Java backend",
   "scripts": {
-    "prepare": "node -e \"try { require('husky').install() } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e }\"",
+    "prepare": "husky",
     "frontend": "cd frontend && npm run dev",
-    "test:frontend": "cd frontend && npm test"
+    "test:frontend": "cd frontend && npm test",
+    "generate:api": "bash ./generate-api.sh"
   },
   "workspaces": [
     "frontend"

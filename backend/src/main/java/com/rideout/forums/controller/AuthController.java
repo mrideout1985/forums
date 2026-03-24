@@ -1,8 +1,8 @@
 package com.rideout.forums.controller;
 
-import com.rideout.forums.dto.AuthRequest;
-import com.rideout.forums.dto.AuthResponse;
-import com.rideout.forums.dto.LoginRequest;
+import com.rideout.forums.model.AuthRequest;
+import com.rideout.forums.model.AuthResponse;
+import com.rideout.forums.model.LoginRequest;
 import com.rideout.forums.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

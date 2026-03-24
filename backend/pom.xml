@@ -111,6 +111,57 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>7.11.0</version>
+				<executions>
+					<!-- Generates Lombok-annotated Java DTOs used by Spring controllers/services -->
+					<execution>
+						<id>generate-java-models</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/static/openapi.yml</inputSpec>
+							<generatorName>spring</generatorName>
+							<output>${project.build.directory}/generated-sources/openapi</output>
+							<generateApis>false</generateApis>
+							<generateModels>true</generateModels>
+							<generateSupportingFiles>false</generateSupportingFiles>
+							<modelPackage>com.rideout.forums.model</modelPackage>
+							<additionalProperties>
+								<useLombok>true</useLombok>
+								<useSpringBoot3>true</useSpringBoot3>
+								<hideGenerationTimestamp>true</hideGenerationTimestamp>
+								<openApiNullable>false</openApiNullable>
+							</additionalProperties>
+						</configuration>
+					</execution>
+					<!-- Generates TypeScript fetch client + models into the frontend -->
+					<execution>
+						<id>generate-typescript-client</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/static/openapi.yml</inputSpec>
+							<generatorName>typescript-fetch</generatorName>
+							<output>${project.basedir}/../frontend/app/generated</output>
+							<generateApis>true</generateApis>
+							<generateModels>true</generateModels>
+							<generateSupportingFiles>true</generateSupportingFiles>
+							<modelNameSuffix>Model</modelNameSuffix>
+							<additionalProperties>
+								<supportsES6>true</supportsES6>
+								<withInterfaces>true</withInterfaces>
+								<hideGenerationTimestamp>true</hideGenerationTimestamp>
+								<enumUnknownDefaultCase>true</enumUnknownDefaultCase>
+							</additionalProperties>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>

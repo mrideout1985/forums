@@ -1,9 +1,9 @@
 {
-  "*.{js,jsx,ts,tsx}": [
-    "cd frontend && npm run lint:fix",
-    "cd frontend && npm run format"
+  "frontend/**/*.{js,jsx,ts,tsx}": [
+    "npx --prefix frontend eslint --config frontend/eslint.config.mjs --fix",
+    "npx --prefix frontend prettier --write"
   ],
-  "*.{json,css,scss,md}": [
-    "cd frontend && npm run format"
+  "frontend/**/*.{json,css,scss,md}": [
+    "npx --prefix frontend prettier --write"
   ]
 }

@@ -2,9 +2,9 @@ package com.rideout.forums.service;
 
 import com.rideout.forums.domain.Role;
 import com.rideout.forums.domain.User;
-import com.rideout.forums.dto.AuthRequest;
-import com.rideout.forums.dto.AuthResponse;
-import com.rideout.forums.dto.LoginRequest;
+import com.rideout.forums.model.AuthRequest;
+import com.rideout.forums.model.AuthResponse;
+import com.rideout.forums.model.LoginRequest;
 import com.rideout.forums.repository.RoleRepository;
 import com.rideout.forums.repository.UserRepository;
 import com.rideout.forums.security.JwtProvider;

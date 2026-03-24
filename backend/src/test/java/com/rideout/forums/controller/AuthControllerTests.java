@@ -1,8 +1,8 @@
 package com.rideout.forums.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rideout.forums.dto.AuthRequest;
-import com.rideout.forums.dto.LoginRequest;
+import com.rideout.forums.model.AuthRequest;
+import com.rideout.forums.model.LoginRequest;
 import com.rideout.forums.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
