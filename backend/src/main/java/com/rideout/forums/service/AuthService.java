@@ -86,12 +86,12 @@ public class AuthService {
                 .map(Role::getName)
                 .collect(java.util.stream.Collectors.toSet());
 
-        return AuthResponse.builder()
-                .token(token)
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .roles(roles)
-                .build();
+        AuthResponse response = new AuthResponse();
+        response.setToken(token);
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setRoles(roles);
+        return response;
     }
 }
 

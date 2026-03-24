@@ -129,12 +129,13 @@
 							<generateModels>true</generateModels>
 							<generateSupportingFiles>false</generateSupportingFiles>
 							<modelPackage>com.rideout.forums.model</modelPackage>
-							<additionalProperties>
+							<configOptions>
 								<useLombok>true</useLombok>
 								<useSpringBoot3>true</useSpringBoot3>
 								<hideGenerationTimestamp>true</hideGenerationTimestamp>
 								<openApiNullable>false</openApiNullable>
-							</additionalProperties>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
 						</configuration>
 					</execution>
 					<!-- Generates TypeScript fetch client + models into the frontend -->
