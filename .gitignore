@@ -53,3 +53,7 @@ frontend/build/
 # OS-specific files
 .DS_Store
 Thumbs.db
+
+# Allure results and reports
+allure-results/
+allure-report/

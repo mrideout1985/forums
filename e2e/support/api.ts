@@ -1,5 +1,5 @@
-import { Configuration } from '~/generated/runtime';
-import { AuthenticationApi } from '~/generated/apis';
+import { Configuration } from '@generated/runtime';
+import { AuthenticationApi } from '@generated/apis';
 
 const config = new Configuration({
   basePath: 'http://localhost:8080',

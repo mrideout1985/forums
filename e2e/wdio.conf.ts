@@ -1,10 +1,10 @@
-import { truncateAll } from './e2e/support/db';
+import { truncateAll } from './support/db.js';
 
 export const config: WebdriverIO.Config = {
   runner: 'local',
   tsConfigPath: './tsconfig.json',
 
-  specs: ['./e2e/features/**/*.feature'],
+  specs: ['./features/**/*.feature'],
   exclude: [],
 
   maxInstances: 10,
@@ -28,7 +28,7 @@ export const config: WebdriverIO.Config = {
   reporters: [['allure', { outputDir: 'allure-results' }]],
 
   cucumberOpts: {
-    require: ['./e2e/features/step-definitions/*.ts'],
+    require: ['./features/step-definitions/*.ts'],
     backtrace: false,
     requireModule: [],
     dryRun: false,
