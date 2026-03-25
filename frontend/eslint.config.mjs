@@ -17,6 +17,7 @@ export default tseslint.config(
       '**/coverage/**',
       '**/.vscode/**',
       '**/.idea/**',
+      '**/generated/**',
     ],
   },
 
@@ -101,6 +102,14 @@ export default tseslint.config(
 
       // Prettier integration
       'prettier/prettier': 'error',
+    },
+  },
+
+  // React Router route files and providers commonly export non-component helpers
+  {
+    files: ['app/routes/**', 'app/providers/**', 'app/root.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 

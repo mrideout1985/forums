@@ -24,21 +24,23 @@ export default function Dashboard() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Rideout Forums
-          </Typography>
-          <Typography variant="body2" sx={{ mr: 2 }}>
-            {user?.username}
-          </Typography>
-          <Button color="inherit" onClick={handleSignOut}>
-            Sign out
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Container sx={{ mt: 4 }}>
-        <Typography variant="h4" fontWeight={600} mb={1}>
+      <header>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h6" component="span" sx={{ flexGrow: 1 }}>
+              Rideout Forums
+            </Typography>
+            <Typography variant="body2" sx={{ mr: 2 }}>
+              {user?.username}
+            </Typography>
+            <Button color="inherit" onClick={handleSignOut}>
+              Sign out
+            </Button>
+          </Toolbar>
+        </AppBar>
+      </header>
+      <Container component="main" id="maincontent" tabIndex={-1} sx={{ mt: 4 }}>
+        <Typography component="h1" variant="h4" fontWeight={600} mb={1}>
           Dashboard
         </Typography>
         <Typography variant="body1" color="text.secondary">

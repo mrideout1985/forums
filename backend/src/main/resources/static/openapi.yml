@@ -17,13 +17,13 @@ servers:
     description: Production Server
 
 security:
-  - BearerAuth: []
+  - CookieAuth: []
 
 paths:
   /api/auth/register:
     post:
       summary: Register a new user
-      description: Create a new user account and receive a JWT token
+      description: Create a new user account. JWT is set as an httpOnly cookie.
       operationId: register
       tags:
         - Authentication
@@ -47,7 +47,7 @@ paths:
   /api/auth/login:
     post:
       summary: Login user
-      description: Authenticate user and receive a JWT token
+      description: Authenticate user. JWT is set as an httpOnly cookie.
       operationId: login
       tags:
         - Authentication
@@ -68,14 +68,43 @@ paths:
         '401':
           description: Invalid credentials
 
+  /api/auth/logout:
+    post:
+      summary: Logout user
+      description: Clear the JWT cookie to end the session
+      operationId: logout
+      tags:
+        - Authentication
+      security: []
+      responses:
+        '204':
+          description: Logged out successfully
+
+  /api/auth/me:
+    get:
+      summary: Get current user
+      description: Returns the currently authenticated user's information
+      operationId: getCurrentUser
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Not authenticated
+
 components:
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt
       description: >
-        JWT authentication token. Use the token received from
+        JWT authentication via httpOnly cookie set by
         /api/auth/login or /api/auth/register
 
   schemas:
@@ -118,7 +147,7 @@ components:
       properties:
         token:
           type: string
-          description: JWT authentication token
+          description: JWT authentication token (present on login/register only)
         username:
           type: string
           description: Username

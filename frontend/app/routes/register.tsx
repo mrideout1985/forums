@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, Link } from 'react-router';
+import { Navigate } from 'react-router';
 import {
   Alert,
   Box,
@@ -7,9 +7,11 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Link as MuiLink,
   TextField,
   Typography,
 } from '@mui/material';
+import { Link } from 'react-router';
 import { ResponseError } from '~/generated/runtime';
 import { useRegister } from '~/hooks/api/useRegister';
 import { useAuth } from '~/providers/AuthProvider';
@@ -27,7 +29,23 @@ export default function Register() {
 
   const { mutate: register, isPending, error } = useRegister();
 
-  if (isLoading) return null;
+  if (isLoading) {
+    return (
+      <Box
+        component="main"
+        id="maincontent"
+        tabIndex={-1}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <CircularProgress aria-label="Loading" />
+      </Box>
+    );
+  }
   if (isAuthenticated) return <Navigate to="/" replace />;
 
   const errorMessage =
@@ -39,6 +57,9 @@ export default function Register() {
 
   return (
     <Box
+      component="main"
+      id="maincontent"
+      tabIndex={-1}
       sx={{
         display: 'flex',
         justifyContent: 'center',
@@ -49,7 +70,7 @@ export default function Register() {
     >
       <Card sx={{ width: '100%', maxWidth: 420, mx: 2 }}>
         <CardContent sx={{ p: 4 }}>
-          <Typography variant="h5" fontWeight={600} mb={1}>
+          <Typography component="h1" variant="h5" fontWeight={600} mb={1}>
             Rideout Forums
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={3}>
@@ -109,7 +130,11 @@ export default function Register() {
               disabled={isPending}
             >
               {isPending ? (
-                <CircularProgress size={22} color="inherit" />
+                <CircularProgress
+                  size={22}
+                  color="inherit"
+                  aria-label="Creating account"
+                />
               ) : (
                 'Create account'
               )}
@@ -118,9 +143,9 @@ export default function Register() {
 
           <Typography variant="body2" align="center" sx={{ mt: 2 }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: 'inherit' }}>
+            <MuiLink component={Link} to="/login">
               Sign in
-            </Link>
+            </MuiLink>
           </Typography>
         </CardContent>
       </Card>

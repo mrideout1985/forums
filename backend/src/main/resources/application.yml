@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:forum}
+    username: ${DB_USER:forum}
+    password: ${DB_PASSWORD:forum}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:mySecretKeyThatIsAtLeast32CharactersLongForHS256}
+    expiration: 86400000
+    cookie-name: jwt
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    url: /openapi.yml
+    operations-sorter: method
+    tags-sorter: alpha
+  show-actuator: false

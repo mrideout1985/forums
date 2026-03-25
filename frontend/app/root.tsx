@@ -37,6 +37,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <a href="#maincontent" className="sr-only">
+          Skip to main content
+        </a>
         {children}
         <ScrollRestoration />
         <Scripts />

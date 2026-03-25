@@ -1,11 +1,14 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
   type ReactNode,
 } from 'react';
+import { AuthenticationApi } from '~/generated/apis/AuthenticationApi';
 import type { AuthResponseModel } from '~/generated/models/AuthResponseModel';
+import { createApiConfig } from '~/lib/apiConfig';
 
 interface AuthUser {
   username: string;
@@ -14,7 +17,6 @@ interface AuthUser {
 }
 
 interface AuthContextValue {
-  token: string | null;
   user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -24,47 +26,42 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const TOKEN_KEY = 'auth_token';
-const USER_KEY = 'auth_user';
+function toAuthUser(response: AuthResponseModel): AuthUser {
+  return {
+    username: response.username ?? '',
+    email: response.email ?? '',
+    roles: response.roles ? Array.from(response.roles) : [],
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem(TOKEN_KEY);
-    const storedUser = localStorage.getItem(USER_KEY);
-    if (storedToken) setToken(storedToken);
-    if (storedUser) setUser(JSON.parse(storedUser) as AuthUser);
-    setIsLoading(false);
+    const api = new AuthenticationApi(createApiConfig());
+    api
+      .getCurrentUser()
+      .then((response) => setUser(toAuthUser(response)))
+      .catch(() => setUser(null))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  function signIn(response: AuthResponseModel) {
-    const authUser: AuthUser = {
-      username: response.username ?? '',
-      email: response.email ?? '',
-      roles: response.roles ? Array.from(response.roles) : [],
-    };
-    setToken(response.token ?? null);
-    setUser(authUser);
-    if (response.token) localStorage.setItem(TOKEN_KEY, response.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(authUser));
-  }
+  const signIn = useCallback((response: AuthResponseModel) => {
+    setUser(toAuthUser(response));
+  }, []);
 
-  function signOut() {
-    setToken(null);
+  const signOut = useCallback(() => {
+    const api = new AuthenticationApi(createApiConfig());
+    api.logout().catch(() => undefined);
     setUser(null);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-  }
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
-        token,
         user,
-        isAuthenticated: !!token,
+        isAuthenticated: !!user,
         isLoading,
         signIn,
         signOut,

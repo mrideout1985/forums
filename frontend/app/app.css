@@ -1,6 +1,7 @@
 :root {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 html,
@@ -12,4 +13,30 @@ body {
     background-color: rgb(3, 7, 18);
     color-scheme: dark;
   }
+}
+
+.sr-only:not(:focus):not(:active) {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+@media (forced-colors: active) {
+  button,
+  .MuiButton-root {
+    border: 2px solid ButtonBorder;
+  }
+
+  .MuiButton-root:focus {
+    outline: 2px solid ButtonText;
+  }
+}
+
+svg {
+  fill: currentColor;
+  stroke: currentColor;
 }
