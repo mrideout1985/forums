@@ -7,6 +7,7 @@ import { AuthProvider } from '~/providers/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Login from '~/routes/login';
 import type { ReactNode } from 'react';
+import { vi } from 'vitest';
 
 function TestApp({
   children,
@@ -84,6 +85,73 @@ describe('Login', () => {
     await waitFor(() => {
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
     });
+  });
+
+  it('should show field validation errors on empty submit', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <TestApp>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </TestApp>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /sign in/i })
+      ).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+    expect(screen.getByText('Username is required.')).toBeInTheDocument();
+    expect(screen.getByText('Password is required.')).toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    expect(screen.getByLabelText(/password/i)).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+  });
+
+  it('should not call login API when client validation fails', async () => {
+    const loginSpy = vi.fn();
+    server.use(
+      http.post('http://localhost:8080/api/auth/login', async ({ request }) => {
+        loginSpy(await request.json());
+        return HttpResponse.json(
+          { error: 'Invalid credentials' },
+          { status: 401 }
+        );
+      })
+    );
+
+    const user = userEvent.setup();
+
+    render(
+      <TestApp>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </TestApp>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /sign in/i })
+      ).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Username is required.')).toBeInTheDocument();
+    });
+    expect(loginSpy).not.toHaveBeenCalled();
   });
 
   it('should show error message on 401', async () => {

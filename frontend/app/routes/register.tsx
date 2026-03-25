@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Navigate } from 'react-router';
 import {
   Alert,
@@ -12,10 +11,17 @@ import {
   Typography,
 } from '@mui/material';
 import { Link } from 'react-router';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
 import { ResponseError } from '~/generated/runtime';
 import { useRegister } from '~/hooks/api/useRegister';
 import { useAuth } from '~/providers/AuthProvider';
+import {
+  type RegisterInput,
+  registerSchema,
+} from '~/validation/authValidation';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function meta() {
   return [{ title: 'Register - Rideout Forums' }];
 }
@@ -23,11 +29,17 @@ export function meta() {
 export default function Register() {
   const { isAuthenticated, isLoading } = useAuth();
 
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
   const { mutate: register, isPending, error } = useRegister();
+  const { control, handleSubmit } = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+    defaultValues: {
+      username: '',
+      email: '',
+      password: '',
+    },
+  });
 
   if (isLoading) {
     return (
@@ -54,6 +66,10 @@ export default function Register() {
         ? 'Username or email already taken.'
         : 'Something went wrong. Please try again.'
       : error?.message;
+
+  const onSubmit = handleSubmit((data) => {
+    register(data);
+  });
 
   return (
     <Box
@@ -85,45 +101,66 @@ export default function Register() {
 
           <Box
             component="form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              register({ username, email, password });
+            noValidate
+            onSubmit={(event) => {
+              void onSubmit(event);
             }}
           >
-            <TextField
-              label="Username"
+            <Controller
               name="username"
-              fullWidth
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              sx={{ mb: 2 }}
-              required
-              autoFocus
-              autoComplete="username"
-              inputProps={{ minLength: 3, maxLength: 50 }}
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Username"
+                  name="username"
+                  fullWidth
+                  sx={{ mb: 2 }}
+                  required
+                  autoFocus
+                  autoComplete="username"
+                  inputProps={{ minLength: 3, maxLength: 50 }}
+                  error={Boolean(fieldState.error)}
+                  helperText={fieldState.error?.message}
+                />
+              )}
             />
-            <TextField
-              label="Email"
+            <Controller
               name="email"
-              type="email"
-              fullWidth
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              sx={{ mb: 2 }}
-              required
-              autoComplete="email"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Email"
+                  name="email"
+                  type="email"
+                  fullWidth
+                  sx={{ mb: 2 }}
+                  required
+                  autoComplete="email"
+                  error={Boolean(fieldState.error)}
+                  helperText={fieldState.error?.message}
+                />
+              )}
             />
-            <TextField
-              label="Password"
+            <Controller
               name="password"
-              type="password"
-              fullWidth
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              sx={{ mb: 3 }}
-              required
-              autoComplete="new-password"
-              inputProps={{ minLength: 8 }}
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Password"
+                  name="password"
+                  type="password"
+                  fullWidth
+                  sx={{ mb: 3 }}
+                  required
+                  autoComplete="new-password"
+                  inputProps={{ minLength: 8 }}
+                  error={Boolean(fieldState.error)}
+                  helperText={fieldState.error?.message}
+                />
+              )}
             />
             <Button
               type="submit"

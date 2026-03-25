@@ -7,6 +7,7 @@ import { AuthProvider } from '~/providers/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Register from '~/routes/register';
 import type { ReactNode } from 'react';
+import { vi } from 'vitest';
 
 function TestApp({
   children,
@@ -86,6 +87,90 @@ describe('Register', () => {
     await waitFor(() => {
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
     });
+  });
+
+  it('should show field validation errors for invalid register input', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <TestApp>
+        <Routes>
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </TestApp>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/username/i), 'ab');
+    await user.type(screen.getByLabelText(/email/i), 'not-an-email');
+    await user.type(screen.getByLabelText(/password/i), 'short');
+    await user.click(screen.getByRole('button', { name: /create account/i }));
+
+    expect(
+      screen.getByText('Username must be at least 3 characters.')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Enter a valid email address.')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Password must be at least 8 characters.')
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    expect(screen.getByLabelText(/email/i)).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    expect(screen.getByLabelText(/password/i)).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+  });
+
+  it('should not call register API when client validation fails', async () => {
+    const registerSpy = vi.fn();
+    server.use(
+      http.post(
+        'http://localhost:8080/api/auth/register',
+        async ({ request }) => {
+          registerSpy(await request.json());
+          return HttpResponse.json(
+            { error: 'Username already exists' },
+            { status: 400 }
+          );
+        }
+      )
+    );
+
+    const user = userEvent.setup();
+
+    render(
+      <TestApp>
+        <Routes>
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </TestApp>
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /create account/i })
+      ).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Username must be at least 3 characters.')
+      ).toBeInTheDocument();
+    });
+    expect(registerSpy).not.toHaveBeenCalled();
   });
 
   it('should show error message on 400 (duplicate)', async () => {
