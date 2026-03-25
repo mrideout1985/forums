@@ -92,6 +92,7 @@ export default function Register() {
           >
             <TextField
               label="Username"
+              name="username"
               fullWidth
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -103,6 +104,7 @@ export default function Register() {
             />
             <TextField
               label="Email"
+              name="email"
               type="email"
               fullWidth
               value={email}
@@ -113,6 +115,7 @@ export default function Register() {
             />
             <TextField
               label="Password"
+              name="password"
               type="password"
               fullWidth
               value={password}

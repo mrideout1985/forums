@@ -91,6 +91,7 @@ export default function Login() {
           >
             <TextField
               label="Username"
+              name="username"
               fullWidth
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -101,6 +102,7 @@ export default function Login() {
             />
             <TextField
               label="Password"
+              name="password"
               type="password"
               fullWidth
               value={password}
