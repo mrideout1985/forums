@@ -1,23 +1,69 @@
 import { z } from 'zod';
 
+export interface PasswordRule {
+  label: string;
+  test: (value: string) => boolean;
+  message: string;
+}
+
+export const passwordRules: PasswordRule[] = [
+  {
+    label: 'At least 6 characters',
+    test: (v) => v.length >= 6,
+    message: 'Password must be at least 6 characters.',
+  },
+  {
+    label: 'At least one uppercase letter',
+    test: (v) => /[A-Z]/.test(v),
+    message: 'Password must contain at least one uppercase letter.',
+  },
+  {
+    label: 'At least one lowercase letter',
+    test: (v) => /[a-z]/.test(v),
+    message: 'Password must contain at least one lowercase letter.',
+  },
+  {
+    label: 'At least one digit',
+    test: (v) => /\d/.test(v),
+    message: 'Password must contain at least one digit.',
+  },
+  {
+    label: 'At least one special character (!@#$%^&*())',
+    test: (v) => /[!@#$%^&*()]/.test(v),
+    message: 'Password must contain at least one special character.',
+  },
+];
+
 export const loginSchema = z.object({
   username: z.string().trim().min(1, 'Username is required.'),
   password: z.string().min(1, 'Password is required.'),
 });
 
-export const registerSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(3, 'Username must be at least 3 characters.')
-    .max(50, 'Username must be 50 characters or fewer.'),
-  email: z
-    .string()
-    .trim()
-    .min(1, 'Email is required.')
-    .email('Enter a valid email address.'),
-  password: z.string().min(8, 'Password must be at least 8 characters.'),
-});
+export const registerSchema = z
+  .object({
+    username: z
+      .string()
+      .trim()
+      .min(3, 'Username must be at least 3 characters.')
+      .max(20, 'Username must be 20 characters or fewer.'),
+    email: z
+      .string()
+      .trim()
+      .min(1, 'Email is required.')
+      .email('Enter a valid email address.'),
+    password: z.string().superRefine((val, ctx) => {
+      for (const rule of passwordRules) {
+        if (!rule.test(val)) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: rule.message });
+        }
+      }
+    }),
+    confirmPassword: z.string().min(1, 'Confirm password is required.'),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: 'Passwords do not match.',
+    path: ['confirmPassword'],
+  });
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -63,6 +109,7 @@ export function validateRegister(values: {
   username: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }): ValidationResult<RegisterInput, RegisterField> {
   const result = registerSchema.safeParse(values);
 

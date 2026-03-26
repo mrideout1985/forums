@@ -44,7 +44,8 @@ describe('useRegister', () => {
       result.current.mutate({
         username: 'newuser',
         email: 'new@example.com',
-        password: 'password123',
+        password: 'Password1!',
+        confirmPassword: 'Password1!',
       });
     });
 
@@ -64,7 +65,8 @@ describe('useRegister', () => {
       result.current.mutate({
         username: 'taken',
         email: 'taken@example.com',
-        password: 'password123',
+        password: 'Password1!',
+        confirmPassword: 'Password1!',
       });
     });
 
@@ -91,7 +93,8 @@ describe('useRegister', () => {
       result.current.mutate({
         username: 'newuser',
         email: 'new@example.com',
-        password: 'password123',
+        password: 'Password1!',
+        confirmPassword: 'Password1!',
       });
     });
 
@@ -113,7 +116,8 @@ describe('useRegister', () => {
       result.current.mutate({
         username: 'newuser',
         email: 'new@example.com',
-        password: 'password123',
+        password: 'Password1!',
+        confirmPassword: 'Password1!',
       });
     });
 

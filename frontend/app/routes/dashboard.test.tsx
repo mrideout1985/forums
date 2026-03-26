@@ -52,7 +52,7 @@ describe('Dashboard', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/welcome back, testuser/i)).toBeInTheDocument();
+      expect(screen.getByText('Welcome back, testuser!')).toBeInTheDocument();
     });
   });
 
@@ -67,7 +67,7 @@ describe('Dashboard', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: /sign out/i })
+        screen.getByRole('button', { name: 'Sign out' })
       ).toBeInTheDocument();
     });
   });
@@ -86,11 +86,11 @@ describe('Dashboard', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: /sign out/i })
+        screen.getByRole('button', { name: 'Sign out' })
       ).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole('button', { name: /sign out/i }));
+    await user.click(screen.getByRole('button', { name: 'Sign out' }));
 
     await waitFor(() => {
       expect(screen.getByText('Login Page')).toBeInTheDocument();
@@ -124,7 +124,7 @@ describe('Dashboard', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', { name: /dashboard/i })
+        screen.getByRole('heading', { name: 'Dashboard' })
       ).toBeInTheDocument();
     });
   });

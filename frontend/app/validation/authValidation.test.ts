@@ -31,7 +31,8 @@ describe('authValidation', () => {
     const result = validateRegister({
       username: '  newuser  ',
       email: '  test@example.com  ',
-      password: 'password123',
+      password: 'Password1!',
+      confirmPassword: 'Password1!',
     });
 
     expect(result.success).toBe(true);
@@ -39,7 +40,8 @@ describe('authValidation', () => {
       expect(result.data).toEqual({
         username: 'newuser',
         email: 'test@example.com',
-        password: 'password123',
+        password: 'Password1!',
+        confirmPassword: 'Password1!',
       });
     }
   });
@@ -49,6 +51,7 @@ describe('authValidation', () => {
       username: 'ab',
       email: 'bad-email',
       password: 'short',
+      confirmPassword: '',
     });
 
     expect(result.success).toBe(false);
@@ -56,7 +59,24 @@ describe('authValidation', () => {
       expect(result.errors).toEqual({
         username: 'Username must be at least 3 characters.',
         email: 'Enter a valid email address.',
-        password: 'Password must be at least 8 characters.',
+        password: 'Password must be at least 6 characters.',
+        confirmPassword: 'Confirm password is required.',
+      });
+    }
+  });
+
+  it('returns a confirm password error when passwords do not match', () => {
+    const result = validateRegister({
+      username: 'newuser',
+      email: 'test@example.com',
+      password: 'Password1!',
+      confirmPassword: 'Password2!',
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.errors).toEqual({
+        confirmPassword: 'Passwords do not match.',
       });
     }
   });
@@ -68,6 +88,6 @@ describe('authValidation', () => {
     expect(validateRegisterField('email', 'bad')).toBe(
       'Enter a valid email address.'
     );
-    expect(validateRegisterField('password', 'password123')).toBeUndefined();
+    expect(validateRegisterField('password', 'Password1!')).toBeUndefined();
   });
 });

@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
   Box,
@@ -10,9 +10,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Link } from 'react-router';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
+import { Link, Navigate } from 'react-router';
+import Loader from '~/components/loader/Loader';
 import { ResponseError } from '~/generated/runtime';
 import { useRegister } from '~/hooks/api/useRegister';
 import { useAuth } from '~/providers/AuthProvider';
@@ -21,15 +21,17 @@ import {
   registerSchema,
 } from '~/validation/authValidation';
 
-// eslint-disable-next-line react-refresh/only-export-components
-export function meta() {
-  return [{ title: 'Register - Rideout Forums' }];
+interface RegisterFormProps {
+  isPending: boolean;
+  errorMessage?: string;
+  onSubmit: (data: RegisterInput) => void;
 }
 
-export default function Register() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  const { mutate: register, isPending, error } = useRegister();
+const RegisterForm = ({
+  isPending,
+  errorMessage,
+  onSubmit,
+}: RegisterFormProps) => {
   const { control, handleSubmit } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     mode: 'onSubmit',
@@ -38,38 +40,15 @@ export default function Register() {
       username: '',
       email: '',
       password: '',
+      confirmPassword: '',
     },
   });
 
-  if (isLoading) {
-    return (
-      <Box
-        component="main"
-        id="maincontent"
-        tabIndex={-1}
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <CircularProgress aria-label="Loading" />
-      </Box>
-    );
-  }
-  if (isAuthenticated) return <Navigate to="/" replace />;
-
-  const errorMessage =
-    error instanceof ResponseError
-      ? error.response.status === 400
-        ? 'Username or email already taken.'
-        : 'Something went wrong. Please try again.'
-      : error?.message;
-
-  const onSubmit = handleSubmit((data) => {
-    register(data);
-  });
+  const onFormSubmit: React.SubmitEventHandler = (event) => {
+    void handleSubmit((data) => {
+      onSubmit(data);
+    })(event);
+  };
 
   return (
     <Box
@@ -99,13 +78,7 @@ export default function Register() {
             </Alert>
           )}
 
-          <Box
-            component="form"
-            noValidate
-            onSubmit={(event) => {
-              void onSubmit(event);
-            }}
-          >
+          <Box component="form" noValidate onSubmit={onFormSubmit}>
             <Controller
               name="username"
               control={control}
@@ -119,7 +92,7 @@ export default function Register() {
                   required
                   autoFocus
                   autoComplete="username"
-                  inputProps={{ minLength: 3, maxLength: 50 }}
+                  inputProps={{ minLength: 3, maxLength: 20 }}
                   error={Boolean(fieldState.error)}
                   helperText={fieldState.error?.message}
                 />
@@ -153,10 +126,29 @@ export default function Register() {
                   name="password"
                   type="password"
                   fullWidth
+                  sx={{ mb: 2 }}
+                  required
+                  autoComplete="new-password"
+                  inputProps={{ minLength: 6 }}
+                  error={Boolean(fieldState.error)}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              name="confirmPassword"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Confirm password"
+                  name="confirmPassword"
+                  type="password"
+                  fullWidth
                   sx={{ mb: 3 }}
                   required
                   autoComplete="new-password"
-                  inputProps={{ minLength: 8 }}
+                  inputProps={{ minLength: 6 }}
                   error={Boolean(fieldState.error)}
                   helperText={fieldState.error?.message}
                 />
@@ -190,5 +182,40 @@ export default function Register() {
         </CardContent>
       </Card>
     </Box>
+  );
+};
+
+export function meta() {
+  return [{ title: 'Register - Rideout Forums' }];
+}
+
+export default function Register() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const { mutate: register, isPending, error } = useRegister();
+
+  const handleRegister = (data: RegisterInput) => {
+    register(data);
+  };
+
+  if (isAuthenticated) return <Navigate to="/" replace />;
+
+  const errorMessage =
+    error instanceof ResponseError
+      ? error.response.status === 400
+        ? 'Username or email already taken.'
+        : 'Something went wrong. Please try again.'
+      : error?.message;
+
+  return (
+    <Loader
+      ready={!isLoading}
+      render={() => (
+        <RegisterForm
+          isPending={isPending}
+          errorMessage={errorMessage}
+          onSubmit={handleRegister}
+        />
+      )}
+    />
   );
 }

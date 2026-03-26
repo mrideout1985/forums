@@ -114,20 +114,25 @@ components:
         - username
         - email
         - password
+        - confirmPassword
       properties:
         username:
           type: string
           minLength: 3
-          maxLength: 50
-          description: Username (3–50 characters)
+          maxLength: 20
+          description: Username (3–20 characters)
         email:
           type: string
           format: email
           description: Valid email address
         password:
           type: string
-          minLength: 8
-          description: Password (minimum 8 characters)
+          minLength: 6
+          description: Password (minimum 6 characters)
+        confirmPassword:
+          type: string
+          minLength: 6
+          description: Password confirmation (must match password)
 
     LoginRequest:
       type: object

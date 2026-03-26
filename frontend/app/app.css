@@ -6,13 +6,10 @@
 
 html,
 body {
-  background-color: white;
+  /* background-color and color are owned by MUI CssBaseline + theme.
+     Do not set them here — they would conflict with the CSS variables
+     emitted by the theme's colorSchemes API. */
   font-family: var(--font-sans);
-
-  @media (prefers-color-scheme: dark) {
-    background-color: rgb(3, 7, 18);
-    color-scheme: dark;
-  }
 }
 
 .sr-only:not(:focus):not(:active) {

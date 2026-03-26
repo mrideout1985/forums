@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
   Box,
@@ -10,23 +10,21 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Link } from 'react-router';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
+import { Link, Navigate } from 'react-router';
+import Loader from '~/components/loader/Loader';
 import { ResponseError } from '~/generated/runtime';
 import { useLogin } from '~/hooks/api/useLogin';
 import { useAuth } from '~/providers/AuthProvider';
 import { type LoginInput, loginSchema } from '~/validation/authValidation';
 
-// eslint-disable-next-line react-refresh/only-export-components
-export function meta() {
-  return [{ title: 'Sign In - Rideout Forums' }];
+interface LoginFormProps {
+  isPending: boolean;
+  errorMessage?: string;
+  onSubmit: (data: LoginInput) => void;
 }
 
-export default function Login() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  const { mutate: login, isPending, error } = useLogin();
+const LoginForm = ({ isPending, errorMessage, onSubmit }: LoginFormProps) => {
   const { control, handleSubmit } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     mode: 'onSubmit',
@@ -37,35 +35,11 @@ export default function Login() {
     },
   });
 
-  if (isLoading) {
-    return (
-      <Box
-        component="main"
-        id="maincontent"
-        tabIndex={-1}
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <CircularProgress aria-label="Loading" />
-      </Box>
-    );
-  }
-  if (isAuthenticated) return <Navigate to="/" replace />;
-
-  const errorMessage =
-    error instanceof ResponseError
-      ? error.response.status === 401
-        ? 'Invalid username or password.'
-        : 'Something went wrong. Please try again.'
-      : error?.message;
-
-  const onSubmit = handleSubmit((data) => {
-    login(data);
-  });
+  const onFormSubmit: React.SubmitEventHandler<HTMLFormElement> = (event) => {
+    void handleSubmit((data) => {
+      onSubmit(data);
+    })(event);
+  };
 
   return (
     <Box
@@ -95,13 +69,7 @@ export default function Login() {
             </Alert>
           )}
 
-          <Box
-            component="form"
-            noValidate
-            onSubmit={(event) => {
-              void onSubmit(event);
-            }}
-          >
+          <Box component="form" noValidate onSubmit={onFormSubmit}>
             <Controller
               name="username"
               control={control}
@@ -166,5 +134,40 @@ export default function Login() {
         </CardContent>
       </Card>
     </Box>
+  );
+};
+
+export function meta() {
+  return [{ title: 'Sign In - Rideout Forums' }];
+}
+
+export default function Login() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const { mutate: login, isPending, error } = useLogin();
+
+  const handleLogin = (data: LoginInput) => {
+    login(data);
+  };
+
+  if (isAuthenticated) return <Navigate to="/" replace />;
+
+  const errorMessage =
+    error instanceof ResponseError
+      ? error.response.status === 401
+        ? 'Invalid username or password.'
+        : 'Something went wrong. Please try again.'
+      : error?.message;
+
+  return (
+    <Loader
+      ready={!isLoading}
+      render={() => (
+        <LoginForm
+          isPending={isPending}
+          errorMessage={errorMessage}
+          onSubmit={handleLogin}
+        />
+      )}
+    />
   );
 }

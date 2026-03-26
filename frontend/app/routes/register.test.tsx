@@ -51,15 +51,15 @@ describe('Register', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', { name: /rideout forums/i })
+        screen.getByRole('heading', { name: 'Rideout Forums' })
       ).toBeInTheDocument();
     });
 
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Username *')).toBeInTheDocument();
+    expect(screen.getByLabelText('Email *')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password *')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /create account/i })
+      screen.getByRole('button', { name: 'Create account' })
     ).toBeInTheDocument();
   });
 
@@ -76,60 +76,21 @@ describe('Register', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+      expect(screen.getByLabelText('Username *')).toBeInTheDocument();
     });
 
-    await user.type(screen.getByLabelText(/username/i), 'newuser');
-    await user.type(screen.getByLabelText(/email/i), 'new@example.com');
-    await user.type(screen.getByLabelText(/password/i), 'password123');
-    await user.click(screen.getByRole('button', { name: /create account/i }));
+    await user.type(screen.getByLabelText('Username *'), 'newuser');
+    await user.type(screen.getByLabelText('Email *'), 'new@example.com');
+    await user.type(screen.getByLabelText('Password *'), 'Password123!*');
+    await user.type(
+      screen.getByLabelText('Confirm password *'),
+      'Password123!*'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create account' }));
 
     await waitFor(() => {
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
     });
-  });
-
-  it('should show field validation errors for invalid register input', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <TestApp>
-        <Routes>
-          <Route path="/register" element={<Register />} />
-        </Routes>
-      </TestApp>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    });
-
-    await user.type(screen.getByLabelText(/username/i), 'ab');
-    await user.type(screen.getByLabelText(/email/i), 'not-an-email');
-    await user.type(screen.getByLabelText(/password/i), 'short');
-    await user.click(screen.getByRole('button', { name: /create account/i }));
-
-    expect(
-      screen.getByText('Username must be at least 3 characters.')
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Enter a valid email address.')
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Password must be at least 8 characters.')
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText(/username/i)).toHaveAttribute(
-      'aria-invalid',
-      'true'
-    );
-    expect(screen.getByLabelText(/email/i)).toHaveAttribute(
-      'aria-invalid',
-      'true'
-    );
-    expect(screen.getByLabelText(/password/i)).toHaveAttribute(
-      'aria-invalid',
-      'true'
-    );
   });
 
   it('should not call register API when client validation fails', async () => {
@@ -159,11 +120,11 @@ describe('Register', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: /create account/i })
+        screen.getByRole('button', { name: 'Create account' })
       ).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole('button', { name: /create account/i }));
+    await user.click(screen.getByRole('button', { name: 'Create account' }));
 
     await waitFor(() => {
       expect(
@@ -194,17 +155,21 @@ describe('Register', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+      expect(screen.getByLabelText('Username *')).toBeInTheDocument();
     });
 
-    await user.type(screen.getByLabelText(/username/i), 'taken');
-    await user.type(screen.getByLabelText(/email/i), 'taken@example.com');
-    await user.type(screen.getByLabelText(/password/i), 'password123');
-    await user.click(screen.getByRole('button', { name: /create account/i }));
+    await user.type(screen.getByLabelText('Username *'), 'taken');
+    await user.type(screen.getByLabelText('Email *'), 'taken@example.com');
+    await user.type(screen.getByLabelText('Password *'), 'Password123!*');
+    await user.type(
+      screen.getByLabelText('Confirm password *'),
+      'Password123!*'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create account' }));
 
     await waitFor(() => {
       expect(
-        screen.getByText(/username or email already taken/i)
+        screen.getByText('Username or email already taken.')
       ).toBeInTheDocument();
     });
   });
@@ -247,9 +212,7 @@ describe('Register', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: /sign in/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Sign in' })).toBeInTheDocument();
     });
   });
 });

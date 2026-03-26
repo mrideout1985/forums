@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
@@ -33,11 +34,45 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(AuthRequest request) {
+        validateRegisterRequest(request);
+
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
+        }
+
+        if (!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        if (request.getUsername().length() < 3 || request.getUsername().length() > 20) {
+            throw new IllegalArgumentException("Username must be between 3 and 20 characters");
+        }
+
+        if (request.getPassword().length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters");
+        }
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+
+        if (!request.getPassword().matches(".*[A-Z].*")) {
+            throw new IllegalArgumentException("Password must contain at least one uppercase letter");
+        }
+
+        if (!request.getPassword().matches(".*[a-z].*")) {
+            throw new IllegalArgumentException("Password must contain at least one lowercase letter");
+        }
+
+        if (!request.getPassword().matches(".*\\d.*")) {
+            throw new IllegalArgumentException("Password must contain at least one digit");
+        }
+
+        if (!request.getPassword().matches(".*[!@#$%^&*()].*")) {
+            throw new IllegalArgumentException("Password must contain at least one special character");
         }
 
         User user = User.builder()
@@ -47,7 +82,6 @@ public class AuthService {
                 .isActive(true)
                 .build();
 
-        // Assign default USER role
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new IllegalArgumentException("Default role not found"));
         user.setRoles(new HashSet<>(Set.of(userRole)));
@@ -62,6 +96,8 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
+        validateLoginRequest(request);
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
@@ -84,5 +120,35 @@ public class AuthService {
         response.setEmail(user.getEmail());
         response.setRoles(roles);
         return response;
+    }
+
+    private void validateRegisterRequest(AuthRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request is required");
+        }
+        if (!StringUtils.hasText(request.getUsername())) {
+            throw new IllegalArgumentException("Username is required");
+        }
+        if (!StringUtils.hasText(request.getEmail())) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (!StringUtils.hasText(request.getPassword())) {
+            throw new IllegalArgumentException("Password is required");
+        }
+        if (!StringUtils.hasText(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("Confirm password is required");
+        }
+    }
+
+    private void validateLoginRequest(LoginRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request is required");
+        }
+        if (!StringUtils.hasText(request.getUsername())) {
+            throw new IllegalArgumentException("Username is required");
+        }
+        if (!StringUtils.hasText(request.getPassword())) {
+            throw new IllegalArgumentException("Password is required");
+        }
     }
 }

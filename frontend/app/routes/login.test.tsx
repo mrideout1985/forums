@@ -51,15 +51,13 @@ describe('Login', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', { name: /rideout forums/i })
+        screen.getByRole('heading', { name: 'Rideout Forums' })
       ).toBeInTheDocument();
     });
 
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /sign in/i })
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Username *')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password *')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
   });
 
   it('should call login API on form submit', async () => {
@@ -75,12 +73,12 @@ describe('Login', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+      expect(screen.getByLabelText('Username *')).toBeInTheDocument();
     });
 
-    await user.type(screen.getByLabelText(/username/i), 'testuser');
-    await user.type(screen.getByLabelText(/password/i), 'password123');
-    await user.click(screen.getByRole('button', { name: /sign in/i }));
+    await user.type(screen.getByLabelText('Username *'), 'testuser');
+    await user.type(screen.getByLabelText('Password *'), 'password123');
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
     await waitFor(() => {
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
@@ -100,19 +98,19 @@ describe('Login', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: /sign in/i })
+        screen.getByRole('button', { name: 'Sign in' })
       ).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole('button', { name: /sign in/i }));
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
     expect(screen.getByText('Username is required.')).toBeInTheDocument();
     expect(screen.getByText('Password is required.')).toBeInTheDocument();
-    expect(screen.getByLabelText(/username/i)).toHaveAttribute(
+    expect(screen.getByLabelText('Username *')).toHaveAttribute(
       'aria-invalid',
       'true'
     );
-    expect(screen.getByLabelText(/password/i)).toHaveAttribute(
+    expect(screen.getByLabelText('Password *')).toHaveAttribute(
       'aria-invalid',
       'true'
     );
@@ -142,11 +140,11 @@ describe('Login', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: /sign in/i })
+        screen.getByRole('button', { name: 'Sign in' })
       ).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole('button', { name: /sign in/i }));
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
     await waitFor(() => {
       expect(screen.getByText('Username is required.')).toBeInTheDocument();
@@ -175,16 +173,16 @@ describe('Login', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+      expect(screen.getByLabelText('Username *')).toBeInTheDocument();
     });
 
-    await user.type(screen.getByLabelText(/username/i), 'wrong');
-    await user.type(screen.getByLabelText(/password/i), 'wrongpass');
-    await user.click(screen.getByRole('button', { name: /sign in/i }));
+    await user.type(screen.getByLabelText('Username *'), 'wrong');
+    await user.type(screen.getByLabelText('Password *'), 'wrongpass');
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
     await waitFor(() => {
       expect(
-        screen.getByText(/invalid username or password/i)
+        screen.getByText('Invalid username or password.')
       ).toBeInTheDocument();
     });
   });
@@ -229,7 +227,7 @@ describe('Login', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('link', { name: /create one/i })
+        screen.getByRole('link', { name: 'Create one' })
       ).toBeInTheDocument();
     });
   });

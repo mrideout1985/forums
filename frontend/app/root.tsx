@@ -7,7 +7,9 @@ import {
   ScrollRestoration,
 } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import { AuthProvider } from '~/providers/AuthProvider';
+import { AppThemeProvider } from '~/providers/ThemeProvider';
 
 import type { Route } from './+types/root';
 import './app.css';
@@ -37,6 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <InitColorSchemeScript defaultMode="system" />
         <a href="#maincontent" className="sr-only">
           Skip to main content
         </a>
@@ -50,11 +53,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <Outlet />
-      </QueryClientProvider>
-    </AuthProvider>
+    <AppThemeProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+        </QueryClientProvider>
+      </AuthProvider>
+    </AppThemeProvider>
   );
 }
 

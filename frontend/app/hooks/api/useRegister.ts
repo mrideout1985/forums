@@ -10,12 +10,18 @@ export function useRegister() {
   const api = useApi(AuthenticationApi);
 
   return useCommand(
-    (vars: { username: string; email: string; password: string }) =>
+    (vars: {
+      username: string;
+      email: string;
+      password: string;
+      confirmPassword: string;
+    }) =>
       api.register({
         authRequestModel: {
           username: vars.username,
           email: vars.email,
           password: vars.password,
+          confirmPassword: vars.confirmPassword,
         },
       }),
     {

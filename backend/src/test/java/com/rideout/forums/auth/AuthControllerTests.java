@@ -67,7 +67,7 @@ class AuthControllerTests {
     @DisplayName("Should register successfully and set JWT cookie")
     void shouldRegisterSuccessfully() {
         var json = """
-            {"username": "testuser", "email": "test@example.com", "password": "password123"}
+            {"username": "testuser", "email": "test@example.com", "password": "password123", "confirmPassword": "password123"}
             """;
 
         assertThat(mvc.post().uri("/api/auth/register")
@@ -86,7 +86,7 @@ class AuthControllerTests {
     @DisplayName("Should set HttpOnly secure cookie on register")
     void shouldSetCookieOnRegister() {
         var json = """
-            {"username": "testuser", "email": "test@example.com", "password": "password123"}
+            {"username": "testuser", "email": "test@example.com", "password": "password123", "confirmPassword": "password123"}
             """;
 
         var result = mvc.post().uri("/api/auth/register")
