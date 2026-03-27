@@ -13,6 +13,10 @@ class RegisterPage extends BasePage {
     return $('[name="password"]');
   }
 
+  get confirmPasswordInput() {
+    return $('[name="confirmPassword"]');
+  }
+
   get submitButton() {
     return $('button[type="submit"]');
   }
@@ -21,7 +25,7 @@ class RegisterPage extends BasePage {
     return $('[role="alert"]');
   }
 
-  async register(username: string, email: string, password: string) {
+  async register(username: string, email: string, password: string, confirmPassword: string) {
     await this.usernameInput.waitForDisplayed();
     await this.usernameInput.click();
     await browser.keys(username);
@@ -29,6 +33,8 @@ class RegisterPage extends BasePage {
     await browser.keys(email);
     await this.passwordInput.click();
     await browser.keys(password);
+    await this.confirmPasswordInput.click();
+    await browser.keys(confirmPassword);
     await this.submitButton.click();
   }
 

@@ -28,7 +28,7 @@ When(
   'the user registers with the following details:',
   async (table: DataTable) => {
     const [row] = table.hashes();
-    await RegisterPage.register(row.Username, row.Email, row.Password);
+    await RegisterPage.register(row.Username, row.Email, row.Password, row['Password Confirmation']);
   }
 );
 

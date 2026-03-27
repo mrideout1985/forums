@@ -13,6 +13,6 @@ export async function registerUser(
   password: string
 ) {
   await authApi.register({
-    authRequestModel: { username, email, password },
+    authRequestModel: { username, email, password, confirmPassword: password },
   });
 }
