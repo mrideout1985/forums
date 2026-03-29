@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="0008-create-posts" author="mrideout">
+        <createTable tableName="posts">
+            <column name="id" type="uuid" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="forum_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="author_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="slug" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="title" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="body" type="text">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="varchar(50)" defaultValue="PUBLISHED">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="posts"
+                columnNames="slug"
+                constraintName="uk_posts_slug"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_posts_forum_id"
+                baseTableName="posts"
+                baseColumnNames="forum_id"
+                referencedTableName="forums"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_posts_author_id"
+                baseTableName="posts"
+                baseColumnNames="author_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+
+        <!-- Composite index for listing posts by forum, newest first -->
+        <createIndex
+                indexName="idx_posts_forum_created"
+                tableName="posts">
+            <column name="forum_id"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <!-- Index for looking up user's posts -->
+        <createIndex
+                indexName="idx_posts_author_id"
+                tableName="posts">
+            <column name="author_id"/>
+        </createIndex>
+
+        <!-- Index for filtering by status (admin operations) -->
+        <createIndex
+                indexName="idx_posts_status"
+                tableName="posts">
+            <column name="status"/>
+        </createIndex>
+
+        <!-- Unique index on slug for fast lookups -->
+        <createIndex
+                indexName="idx_posts_slug"
+                tableName="posts"
+                unique="true">
+            <column name="slug"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

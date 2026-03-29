@@ -7,4 +7,6 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
     <include file="db/changelog/0001-init.xml"/>
     <include file="db/changelog/0002-auth.xml"/>
+    <include file="db/changelog/0003-forums.xml"/>
+    <include file="db/changelog/0004-posts.xml"/>
 </databaseChangeLog>

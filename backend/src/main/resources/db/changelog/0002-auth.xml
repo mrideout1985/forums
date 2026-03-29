@@ -90,6 +90,7 @@
             <column name="description" value="Moderator role"/>
         </insert>
     </changeSet>
+    
 
 </databaseChangeLog>
 
