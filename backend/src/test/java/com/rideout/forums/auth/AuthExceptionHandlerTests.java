@@ -1,23 +1,25 @@
 package com.rideout.forums.auth;
 
+import com.rideout.forums.exception.GlobalExceptionHandler;
+import com.rideout.forums.repository.user.UserRepository;
+import com.rideout.forums.service.auth.AuthService;
+import com.rideout.forums.service.auth.CustomUserDetailsService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import org.springframework.core.MethodParameter;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-@WebMvcTest(AuthExceptionHandler.class)
+@WebMvcTest(GlobalExceptionHandler.class)
 class AuthExceptionHandlerTests {
 
     @Autowired
@@ -34,12 +36,12 @@ class AuthExceptionHandlerTests {
     private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
-    private com.rideout.forums.user.UserRepository userRepository;
+    private UserRepository userRepository;
 
     @MockitoBean
     private com.rideout.forums.config.JwtProperties jwtProperties;
 
-    private final AuthExceptionHandler handler = new AuthExceptionHandler();
+    private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
     @Test
     @DisplayName("Should return 401 for BadCredentialsException")

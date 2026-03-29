@@ -1,8 +1,9 @@
 package com.rideout.forums.auth;
 
 import com.rideout.forums.role.Role;
+import com.rideout.forums.repository.user.UserRepository;
+import com.rideout.forums.service.auth.CustomUserDetailsService;
 import com.rideout.forums.user.User;
-import com.rideout.forums.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

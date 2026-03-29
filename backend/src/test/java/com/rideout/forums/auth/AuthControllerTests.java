@@ -1,19 +1,22 @@
 package com.rideout.forums.auth;
 
 import com.rideout.forums.config.JwtProperties;
+import com.rideout.forums.controller.auth.AuthController;
 import com.rideout.forums.model.AuthRequest;
 import com.rideout.forums.model.AuthResponse;
 import com.rideout.forums.model.LoginRequest;
-import com.rideout.forums.user.UserRepository;
+import com.rideout.forums.repository.user.UserRepository;
+import com.rideout.forums.service.auth.AuthService;
+import com.rideout.forums.service.auth.CustomUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 import java.util.Set;

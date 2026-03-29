@@ -1,5 +1,6 @@
 package com.rideout.forums.user;
 
+import com.rideout.forums.repository.user.UserRepository;
 import com.rideout.forums.role.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

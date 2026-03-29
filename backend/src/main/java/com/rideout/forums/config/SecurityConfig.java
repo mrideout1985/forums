@@ -1,7 +1,7 @@
 package com.rideout.forums.config;
 
 import com.rideout.forums.auth.JwtAuthenticationFilter;
-import com.rideout.forums.auth.CustomUserDetailsService;
+import com.rideout.forums.service.auth.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

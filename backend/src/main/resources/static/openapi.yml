@@ -97,6 +97,318 @@ paths:
         '401':
           description: Not authenticated
 
+  /api/forums:
+    post:
+      summary: Create a new forum
+      description: Create a new forum (admin only)
+      operationId: createForum
+      tags:
+        - Forums
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForumCreateRequest'
+      responses:
+        '201':
+          description: Forum created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumResponse'
+        '400':
+          description: Invalid input or slug already exists
+        '403':
+          description: Unauthorized - admin role required
+
+    get:
+      summary: List all forums
+      description: Retrieve a paginated list of all forums
+      operationId: listForums
+      tags:
+        - Forums
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Page number (0-indexed)
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+          description: Page size
+      responses:
+        '200':
+          description: Forums retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedForumResponse'
+
+  /api/forums/{slug}:
+    get:
+      summary: Get forum by slug
+      description: Retrieve a forum by its slug
+      operationId: getForum
+      tags:
+        - Forums
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Forum slug
+      responses:
+        '200':
+          description: Forum retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumResponse'
+        '404':
+          description: Forum not found
+
+    put:
+      summary: Update forum
+      description: Update forum details (admin only)
+      operationId: updateForum
+      tags:
+        - Forums
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Forum slug
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForumUpdateRequest'
+      responses:
+        '200':
+          description: Forum updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumResponse'
+        '404':
+          description: Forum not found
+        '403':
+          description: Unauthorized - admin role required
+
+    delete:
+      summary: Delete forum
+      description: Delete a forum and all its posts (admin only)
+      operationId: deleteForum
+      tags:
+        - Forums
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Forum slug
+      responses:
+        '204':
+          description: Forum deleted successfully
+        '404':
+          description: Forum not found
+        '403':
+          description: Unauthorized - admin role required
+
+  /api/posts:
+    post:
+      summary: Create a new post
+      description: Create a new post in a forum (authenticated users)
+      operationId: createPost
+      tags:
+        - Posts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreateRequest'
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Invalid input or slug already exists
+        '401':
+          description: Unauthorized - authentication required
+        '404':
+          description: Forum not found
+
+  /api/posts/{slug}:
+    get:
+      summary: Get post by slug
+      description: Retrieve a post by its slug
+      operationId: getPost
+      tags:
+        - Posts
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Post slug
+      responses:
+        '200':
+          description: Post retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '404':
+          description: Post not found
+
+    put:
+      summary: Update post
+      description: Update post details (author or admin only)
+      operationId: updatePost
+      tags:
+        - Posts
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Post slug
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdateRequest'
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '404':
+          description: Post not found
+        '403':
+          description: Unauthorized - owner or admin role required
+        '401':
+          description: Unauthorized - authentication required
+
+    delete:
+      summary: Delete post
+      description: Delete a post (author or admin only)
+      operationId: deletePost
+      tags:
+        - Posts
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Post slug
+      responses:
+        '204':
+          description: Post deleted successfully
+        '404':
+          description: Post not found
+        '403':
+          description: Unauthorized - owner or admin role required
+        '401':
+          description: Unauthorized - authentication required
+
+  /api/forums/{forumSlug}/posts:
+    get:
+      summary: List posts by forum
+      description: Retrieve a paginated list of posts in a forum
+      operationId: listPostsByForum
+      tags:
+        - Posts
+      parameters:
+        - name: forumSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Forum slug
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [DRAFT, PUBLISHED, ARCHIVED]
+          description: Optional status filter
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Page number (0-indexed)
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+          description: Page size
+      responses:
+        '200':
+          description: Posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPostResponse'
+        '404':
+          description: Forum not found
+
+  /api/users/{userId}/posts:
+    get:
+      summary: List posts by author
+      description: Retrieve a paginated list of posts by a specific user
+      operationId: listPostsByAuthor
+      tags:
+        - Posts
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Page number (0-indexed)
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+          description: Page size
+      responses:
+        '200':
+          description: Posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPostResponse'
+
 components:
   securitySchemes:
     CookieAuth:
@@ -165,3 +477,201 @@ components:
             type: string
           uniqueItems: true
           description: Set of user roles
+
+    ForumCreateRequest:
+      type: object
+      required:
+        - slug
+        - name
+      properties:
+        slug:
+          type: string
+          minLength: 3
+          maxLength: 64
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+          description: Forum slug (lowercase, alphanumeric with hyphens)
+        name:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: Forum name
+        description:
+          type: string
+          maxLength: 1000
+          description: Forum description (optional)
+
+    ForumUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: Forum name
+        description:
+          type: string
+          maxLength: 1000
+          description: Forum description
+
+    ForumResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Forum ID
+        slug:
+          type: string
+          description: Forum slug
+        name:
+          type: string
+          description: Forum name
+        description:
+          type: string
+          description: Forum description
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    PaginatedForumResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForumResponse'
+        totalElements:
+          type: integer
+          description: Total number of forums
+        totalPages:
+          type: integer
+          description: Total number of pages
+        number:
+          type: integer
+          description: Current page number
+        size:
+          type: integer
+          description: Page size
+
+    PostCreateRequest:
+      type: object
+      required:
+        - forumSlug
+        - slug
+        - title
+        - body
+      properties:
+        forumSlug:
+          type: string
+          description: Forum slug
+        slug:
+          type: string
+          minLength: 3
+          maxLength: 255
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+          description: Post slug (lowercase, alphanumeric with hyphens)
+        title:
+          type: string
+          minLength: 5
+          maxLength: 500
+          description: Post title
+        body:
+          type: string
+          minLength: 10
+          description: Post body content
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+          default: DRAFT
+          description: Post status
+
+    PostUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 5
+          maxLength: 500
+          description: Post title
+        body:
+          type: string
+          minLength: 10
+          description: Post body content
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+          description: Post status
+
+    AuthorInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Author user ID
+        username:
+          type: string
+          description: Author username
+
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Post ID
+        forumId:
+          type: string
+          format: uuid
+          description: Forum ID
+        forumSlug:
+          type: string
+          description: Forum slug
+        slug:
+          type: string
+          description: Post slug
+        title:
+          type: string
+          description: Post title
+        body:
+          type: string
+          description: Post body
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+          description: Post status
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        author:
+          $ref: '#/components/schemas/AuthorInfo'
+
+    PaginatedPostResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostResponse'
+        totalElements:
+          type: integer
+          description: Total number of posts
+        totalPages:
+          type: integer
+          description: Total number of pages
+        number:
+          type: integer
+          description: Current page number
+        size:
+          type: integer
+          description: Page size

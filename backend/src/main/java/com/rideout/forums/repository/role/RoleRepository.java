@@ -1,4 +1,6 @@
-package com.rideout.forums.role;
+package com.rideout.forums.repository.role;
+
+import com.rideout.forums.role.Role;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

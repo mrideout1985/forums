@@ -1,6 +1,6 @@
-package com.rideout.forums.auth;
+package com.rideout.forums.service.auth;
 
-import com.rideout.forums.user.UserRepository;
+import com.rideout.forums.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

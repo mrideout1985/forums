@@ -1,5 +1,6 @@
 package com.rideout.forums.role;
 
+import com.rideout.forums.repository.role.RoleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

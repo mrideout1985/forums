@@ -1,4 +1,6 @@
-package com.rideout.forums.user;
+package com.rideout.forums.repository.user;
+
+import com.rideout.forums.user.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

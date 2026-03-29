@@ -1,11 +1,12 @@
-package com.rideout.forums.auth;
+package com.rideout.forums.controller.auth;
 
 import com.rideout.forums.config.JwtProperties;
 import com.rideout.forums.model.AuthRequest;
 import com.rideout.forums.model.AuthResponse;
 import com.rideout.forums.model.LoginRequest;
+import com.rideout.forums.repository.user.UserRepository;
+import com.rideout.forums.service.auth.AuthService;
 import com.rideout.forums.user.User;
-import com.rideout.forums.user.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
