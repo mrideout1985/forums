@@ -332,7 +332,7 @@ paths:
         '401':
           description: Unauthorized - authentication required
 
-  /api/forums/{forumSlug}/posts:
+  /api/posts/forum/{forumSlug}:
     get:
       summary: List posts by forum
       description: Retrieve a paginated list of posts in a forum
@@ -408,6 +408,135 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedPostResponse'
+
+  /api/posts/hot:
+    get:
+      summary: List hot posts
+      description: Retrieve a paginated list of hot posts across all forums, sorted by vote score and recency
+      operationId: listHotPosts
+      tags:
+        - Posts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Page number (0-indexed)
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+          description: Page size
+      responses:
+        '200':
+          description: Hot posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPostResponse'
+
+  /api/comments:
+    post:
+      summary: Create a comment
+      description: Create a new comment on a post (authenticated users)
+      operationId: createComment
+      tags:
+        - Comments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreateRequest'
+      responses:
+        '201':
+          description: Comment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized - authentication required
+        '404':
+          description: Post not found
+
+  /api/comments/post/{postSlug}:
+    get:
+      summary: List comments for a post
+      description: Retrieve the comment tree for a post
+      operationId: listCommentsByPost
+      tags:
+        - Comments
+      parameters:
+        - name: postSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Post slug
+      responses:
+        '200':
+          description: Comments retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentResponse'
+
+  /api/comments/{commentId}:
+    delete:
+      summary: Delete a comment
+      description: Delete a comment (author or admin only)
+      operationId: deleteComment
+      tags:
+        - Comments
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Comment ID
+      responses:
+        '204':
+          description: Comment deleted successfully
+        '401':
+          description: Unauthorized - authentication required
+        '403':
+          description: Unauthorized - owner or admin role required
+        '404':
+          description: Comment not found
+
+  /api/votes:
+    post:
+      summary: Cast a vote
+      description: Upvote or downvote a post or comment. Same vote value toggles off. Different value updates.
+      operationId: castVote
+      tags:
+        - Votes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteRequest'
+      responses:
+        '200':
+          description: Vote processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteResponse'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized - authentication required
 
 components:
   securitySchemes:
@@ -645,6 +774,19 @@ components:
           type: string
           enum: [DRAFT, PUBLISHED, ARCHIVED]
           description: Post status
+        upvotes:
+          type: integer
+          description: Number of upvotes
+        downvotes:
+          type: integer
+          description: Number of downvotes
+        userVote:
+          type: integer
+          nullable: true
+          description: Current user's vote (-1, 1, or null if not voted)
+        commentCount:
+          type: integer
+          description: Number of comments on this post
         createdAt:
           type: string
           format: date-time
@@ -675,3 +817,101 @@ components:
         size:
           type: integer
           description: Page size
+
+    CommentCreateRequest:
+      type: object
+      required:
+        - postSlug
+        - body
+      properties:
+        postSlug:
+          type: string
+          description: Slug of the post to comment on
+        body:
+          type: string
+          minLength: 1
+          maxLength: 10000
+          description: Comment body text
+        parentCommentId:
+          type: integer
+          format: int64
+          nullable: true
+          description: ID of the parent comment (null for top-level comments)
+
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Comment ID
+        postSlug:
+          type: string
+          description: Post slug
+        author:
+          $ref: '#/components/schemas/AuthorInfo'
+        body:
+          type: string
+          description: Comment body
+        parentCommentId:
+          type: integer
+          format: int64
+          nullable: true
+          description: Parent comment ID (null for top-level)
+        upvotes:
+          type: integer
+          description: Number of upvotes
+        downvotes:
+          type: integer
+          description: Number of downvotes
+        userVote:
+          type: integer
+          nullable: true
+          description: Current user's vote (-1, 1, or null)
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+          description: Nested replies
+
+    VoteRequest:
+      type: object
+      required:
+        - targetType
+        - targetId
+        - value
+      properties:
+        targetType:
+          type: string
+          enum: [POST, COMMENT]
+          description: Type of target (POST or COMMENT)
+        targetId:
+          type: string
+          description: Target identifier (post slug or comment ID)
+        value:
+          type: integer
+          minimum: -1
+          maximum: 1
+          description: Vote value (-1 for downvote, 1 for upvote)
+
+    VoteResponse:
+      type: object
+      properties:
+        upvotes:
+          type: integer
+          description: Total upvotes on the target
+        downvotes:
+          type: integer
+          description: Total downvotes on the target
+        userVote:
+          type: integer
+          nullable: true
+          description: Current user's vote (-1, 1, or null if removed)

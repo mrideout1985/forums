@@ -5,6 +5,7 @@ import com.rideout.forums.post.PostResponse;
 import com.rideout.forums.post.PostStatus;
 import com.rideout.forums.post.PostUpdateRequest;
 import com.rideout.forums.service.post.PostService;
+import com.rideout.forums.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,11 +20,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -49,10 +51,9 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "Forum not found")
     })
     public ResponseEntity<PostResponse> createPost(
-            @Valid @RequestBody PostCreateRequest request,
-            @AuthenticationPrincipal UserDetails userDetails
+            @Valid @RequestBody PostCreateRequest request
     ) {
-        UUID userId = getUserId(userDetails);
+        UUID userId = getUserId();
         log.info("Creating post with slug: {} by user: {}", request.slug(), userId);
         PostResponse response = postService.createPost(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -68,9 +69,12 @@ public class PostController {
             ),
             @ApiResponse(responseCode = "404", description = "Post not found")
     })
-    public ResponseEntity<PostResponse> getPost(@PathVariable String slug) {
+    public ResponseEntity<PostResponse> getPost(
+            @PathVariable String slug
+    ) {
+        UUID currentUserId = getOptionalUserId();
         log.info("Retrieving post: {}", slug);
-        PostResponse response = postService.getPost(slug);
+        PostResponse response = postService.getPost(slug, currentUserId);
         return ResponseEntity.ok(response);
     }
 
@@ -88,18 +92,19 @@ public class PostController {
             @RequestParam(required = false) String status,
             Pageable pageable
     ) {
+        UUID currentUserId = getOptionalUserId();
         log.info("Listing posts for forum: {} with status filter: {}", forumSlug, status);
 
         Page<PostResponse> response;
         if (status != null && !status.isBlank()) {
             try {
                 PostStatus postStatus = PostStatus.valueOf(status.toUpperCase());
-                response = postService.listPostsByForumAndStatus(forumSlug, postStatus, pageable);
+                response = postService.listPostsByForumAndStatus(forumSlug, postStatus, currentUserId, pageable);
             } catch (IllegalArgumentException e) {
                                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status: " + status);
             }
         } else {
-            response = postService.listPostsByForum(forumSlug, pageable);
+            response = postService.listPostsByForum(forumSlug, currentUserId, pageable);
         }
 
         return ResponseEntity.ok(response);
@@ -115,8 +120,24 @@ public class PostController {
             @PathVariable UUID userId,
             Pageable pageable
     ) {
+        UUID currentUserId = getOptionalUserId();
         log.info("Listing posts for author: {}", userId);
-        Page<PostResponse> response = postService.listPostsByAuthor(userId, pageable);
+        Page<PostResponse> response = postService.listPostsByAuthor(userId, currentUserId, pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/hot")
+    @Operation(summary = "Get hot posts", description = "Retrieve trending posts sorted by engagement score")
+    @ApiResponse(
+            responseCode = "200",
+            description = "Hot posts retrieved successfully"
+    )
+    public ResponseEntity<List<PostResponse>> getHotPosts(
+            @RequestParam(defaultValue = "20") int limit
+    ) {
+        UUID currentUserId = getOptionalUserId();
+        log.info("Retrieving hot posts, limit: {}", limit);
+        List<PostResponse> response = postService.getHotPosts(currentUserId, limit);
         return ResponseEntity.ok(response);
     }
 
@@ -135,10 +156,9 @@ public class PostController {
     })
     public ResponseEntity<PostResponse> updatePost(
             @PathVariable String slug,
-            @Valid @RequestBody PostUpdateRequest request,
-            @AuthenticationPrincipal UserDetails userDetails
+            @Valid @RequestBody PostUpdateRequest request
     ) {
-        UUID userId = getUserId(userDetails);
+        UUID userId = getUserId();
         log.info("Updating post: {} by user: {}", slug, userId);
         PostResponse response = postService.updatePost(slug, request, userId);
         return ResponseEntity.ok(response);
@@ -154,25 +174,25 @@ public class PostController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     })
     public ResponseEntity<Void> deletePost(
-            @PathVariable String slug,
-            @AuthenticationPrincipal UserDetails userDetails
+            @PathVariable String slug
     ) {
-        UUID userId = getUserId(userDetails);
+        UUID userId = getUserId();
         log.info("Deleting post: {} by user: {}", slug, userId);
         postService.deletePost(slug, userId);
         return ResponseEntity.noContent().build();
     }
 
-    private UUID getUserId(UserDetails userDetails) {
-        // This assumes the username is a UUID or can be converted to one.
-        // For production, cache UserDetails lookup or pass through a service
-        try {
-            return UUID.fromString(userDetails.getUsername());
-        } catch (IllegalArgumentException e) {
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "Invalid user ID format: " + userDetails.getUsername()
-                        );
+    private UUID getUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        return user.getId();
+    }
+
+    private UUID getOptionalUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            return getUserId();
         }
+        return null;
     }
 }

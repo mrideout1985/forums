@@ -9,4 +9,7 @@
     <include file="db/changelog/0002-auth.xml"/>
     <include file="db/changelog/0003-forums.xml"/>
     <include file="db/changelog/0004-posts.xml"/>
+    <include file="db/changelog/0005-default-forums.xml"/>
+    <include file="db/changelog/0006-comments.xml"/>
+    <include file="db/changelog/0007-votes.xml"/>
 </databaseChangeLog>

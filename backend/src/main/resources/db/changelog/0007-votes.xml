@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="0011-create-votes" author="mrideout">
+        <createTable tableName="votes">
+            <column name="id" type="bigserial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_type" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_id" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="value" type="smallint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="votes"
+                columnNames="user_id,target_type,target_id"
+                constraintName="uk_votes_user_target"/>
+
+        <sql>ALTER TABLE votes ADD CONSTRAINT ck_votes_value CHECK (value IN (-1, 1));</sql>
+
+        <addForeignKeyConstraint
+                constraintName="fk_votes_user_id"
+                baseTableName="votes"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"/>
+
+        <createIndex indexName="idx_votes_target" tableName="votes">
+            <column name="target_type"/>
+            <column name="target_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

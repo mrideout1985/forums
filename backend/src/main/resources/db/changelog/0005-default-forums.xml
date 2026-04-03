@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="0009-insert-default-forums" author="mrideout">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM forums WHERE id IN ('a0000000-0000-0000-0000-000000000001'::uuid, 'a0000000-0000-0000-0000-000000000002'::uuid, 'a0000000-0000-0000-0000-000000000003'::uuid)</sqlCheck>
+        </preConditions>
+
+        <insert tableName="forums">
+            <column name="id" value="a0000000-0000-0000-0000-000000000001"/>
+            <column name="slug" value="general"/>
+            <column name="name" value="General"/>
+            <column name="description" value="General discussion about anything and everything."/>
+        </insert>
+        <insert tableName="forums">
+            <column name="id" value="a0000000-0000-0000-0000-000000000002"/>
+            <column name="slug" value="announcements"/>
+            <column name="name" value="Announcements"/>
+            <column name="description" value="Official announcements and news from the team."/>
+        </insert>
+        <insert tableName="forums">
+            <column name="id" value="a0000000-0000-0000-0000-000000000003"/>
+            <column name="slug" value="off-topic"/>
+            <column name="name" value="Off Topic"/>
+            <column name="description" value="Casual conversations that don't fit elsewhere."/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

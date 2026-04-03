@@ -1,13 +1,17 @@
 package com.rideout.forums.config;
 
 import com.rideout.forums.auth.JwtProvider;
+import com.rideout.forums.controller.comment.CommentController;
 import com.rideout.forums.controller.forum.ForumController;
 import com.rideout.forums.controller.post.PostController;
+import com.rideout.forums.controller.vote.VoteController;
 import com.rideout.forums.repository.role.RoleRepository;
 import com.rideout.forums.repository.user.UserRepository;
 import com.rideout.forums.role.Role;
 import com.rideout.forums.service.auth.AuthService;
 import com.rideout.forums.service.auth.CustomUserDetailsService;
+import com.rideout.forums.service.comment.CommentService;
+import com.rideout.forums.service.vote.VoteService;
 import com.rideout.forums.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +61,18 @@ class SecurityConfigTests {
 
     @MockitoBean
     private PostController postController;
+
+    @MockitoBean
+    private CommentController commentController;
+
+    @MockitoBean
+    private VoteController voteController;
+
+    @MockitoBean
+    private CommentService commentService;
+
+    @MockitoBean
+    private VoteService voteService;
 
     @MockitoBean
     private JwtProvider jwtProvider;
