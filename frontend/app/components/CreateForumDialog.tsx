@@ -81,7 +81,7 @@ export default function CreateForumDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <form onSubmit={() => handleSubmit((data) => mutate(data))} noValidate>
+      <form onSubmit={handleSubmit((data) => mutate(data))} noValidate>
         <DialogTitle>Create Forum</DialogTitle>
         <DialogContent>
           <TextField

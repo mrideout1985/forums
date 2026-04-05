@@ -100,6 +100,11 @@ export default tseslint.config(
       'no-var': 'error',
       'eqeqeq': ['error', 'always', { null: 'ignore' }],
 
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        { checksVoidReturn: false },
+      ],
+
       // Prettier integration
       'prettier/prettier': 'error',
     },

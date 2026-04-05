@@ -1,4 +1,5 @@
-import { Stack, Typography, Alert } from '@mui/material';
+import { Alert, Box, Stack } from '@mui/material';
+import ContextHeader from '~/components/ContextHeader';
 import PostCard from '~/components/PostCard';
 import { useHotPosts, useVoteOnPost } from '~/hooks/api/usePosts';
 import Loader from '~/components/loader/Loader';
@@ -29,14 +30,14 @@ export default function HotFeed() {
 
         return (
           <>
-            <Typography component="h1" variant="h4" fontWeight={600} mb={2}>
-              Hot Posts
-            </Typography>
-            <Stack spacing={2}>
-              {hotPosts.data.content.map((post) => (
-                <PostCard key={post.id} post={post} onVote={handleVote} />
-              ))}
-            </Stack>
+            <ContextHeader title="Hot Posts" />
+            <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+              <Stack spacing={2}>
+                {hotPosts.data.content.map((post) => (
+                  <PostCard key={post.id} post={post} onVote={handleVote} />
+                ))}
+              </Stack>
+            </Box>
           </>
         );
       }}

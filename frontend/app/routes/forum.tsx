@@ -1,12 +1,7 @@
 import { useNavigate, useParams } from 'react-router';
-import {
-  Alert,
-  Button,
-  CircularProgress,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Stack } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import ContextHeader from '~/components/ContextHeader';
 import PostCard from '~/components/PostCard';
 import { useForum } from '~/hooks/api/useForums';
 import { usePostsByForum, useVoteOnPost } from '~/hooks/api/usePosts';
@@ -44,43 +39,32 @@ export default function ForumView() {
 
   return (
     <>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={2}
-      >
-        <div>
-          <Typography component="h1" variant="h4" fontWeight={600}>
-            {forum?.name}
-          </Typography>
-          {forum?.description && (
-            <Typography variant="body2" color="text.secondary">
-              {forum.description}
-            </Typography>
+      <ContextHeader
+        title={forum?.name ?? ''}
+        description={forum?.description}
+        action={
+          isAuthenticated ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => void navigate(`/forums/${forumSlug}/posts/new`)}
+            >
+              New Post
+            </Button>
+          ) : undefined
+        }
+      />
+      <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+        <Stack spacing={2}>
+          {posts.length === 0 ? (
+            <Alert severity="info">No posts in this forum yet.</Alert>
+          ) : (
+            posts.map((post) => (
+              <PostCard key={post.id} post={post} onVote={handleVote} />
+            ))
           )}
-        </div>
-        {isAuthenticated && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => void navigate(`/forums/${forumSlug}/posts/new`)}
-          >
-            New Post
-          </Button>
-        )}
-      </Stack>
-      <Stack spacing={2}>
-        {posts.length === 0 ? (
-          <Typography color="text.secondary">
-            No posts in this forum yet.
-          </Typography>
-        ) : (
-          posts.map((post) => (
-            <PostCard key={post.id} post={post} onVote={handleVote} />
-          ))
-        )}
-      </Stack>
+        </Stack>
+      </Box>
     </>
   );
 }

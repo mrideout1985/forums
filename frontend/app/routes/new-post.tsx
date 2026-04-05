@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Stack, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router';
 import { z } from 'zod';
+import ContextHeader from '~/components/ContextHeader';
 import { useCreatePost } from '~/hooks/api/usePosts';
 
 const newPostSchema = z.object({
@@ -61,59 +62,59 @@ export default function NewPostForm() {
 
   return (
     <>
-      <Typography component="h1" variant="h4" fontWeight={600} mb={3}>
-        Create a Post
-      </Typography>
-      <Box
-        component="form"
-        onSubmit={() => handleSubmit(onSubmit)}
-        noValidate
-        sx={{ maxWidth: 720 }}
-      >
-        <Stack spacing={2}>
-          <TextField
-            {...register('title')}
-            label="Title"
-            fullWidth
-            required
-            error={!!errors.title}
-            helperText={errors.title?.message}
-            aria-invalid={!!errors.title}
-          />
-          <TextField
-            {...register('slug')}
-            label="Slug"
-            fullWidth
-            required
-            error={!!errors.slug}
-            helperText={
-              errors.slug?.message ?? 'URL-friendly identifier (e.g. my-post)'
-            }
-            aria-invalid={!!errors.slug}
-          />
-          <TextField
-            {...register('body')}
-            label="Body"
-            fullWidth
-            required
-            multiline
-            rows={8}
-            error={!!errors.body}
-            helperText={errors.body?.message}
-            aria-invalid={!!errors.body}
-          />
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              variant="outlined"
-              onClick={() => void navigate(`/forums/${forumSlug}`)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" disabled={isPending}>
-              {isPending ? 'Creating...' : 'Create Post'}
-            </Button>
-          </Box>
-        </Stack>
+      <ContextHeader title="Create a Post" />
+      <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          sx={{ maxWidth: 720 }}
+        >
+          <Stack spacing={2}>
+            <TextField
+              {...register('title')}
+              label="Title"
+              fullWidth
+              required
+              error={!!errors.title}
+              helperText={errors.title?.message}
+              aria-invalid={!!errors.title}
+            />
+            <TextField
+              {...register('slug')}
+              label="Slug"
+              fullWidth
+              required
+              error={!!errors.slug}
+              helperText={
+                errors.slug?.message ?? 'URL-friendly identifier (e.g. my-post)'
+              }
+              aria-invalid={!!errors.slug}
+            />
+            <TextField
+              {...register('body')}
+              label="Body"
+              fullWidth
+              required
+              multiline
+              rows={8}
+              error={!!errors.body}
+              helperText={errors.body?.message}
+              aria-invalid={!!errors.body}
+            />
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="outlined"
+                onClick={() => void navigate(`/forums/${forumSlug}`)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" variant="contained" disabled={isPending}>
+                {isPending ? 'Creating...' : 'Create Post'}
+              </Button>
+            </Box>
+          </Stack>
+        </Box>
       </Box>
     </>
   );

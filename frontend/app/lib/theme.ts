@@ -242,6 +242,14 @@ export const theme = createTheme({
   },
 
   components: {
+    MuiList: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+        },
+      },
+    },
+
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {

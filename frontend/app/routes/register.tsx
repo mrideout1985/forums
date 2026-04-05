@@ -92,7 +92,6 @@ const RegisterForm = ({
                   required
                   autoFocus
                   autoComplete="username"
-                  inputProps={{ minLength: 3, maxLength: 20 }}
                   error={Boolean(fieldState.error)}
                   helperText={fieldState.error?.message}
                 />
@@ -129,7 +128,6 @@ const RegisterForm = ({
                   sx={{ mb: 2 }}
                   required
                   autoComplete="new-password"
-                  inputProps={{ minLength: 6 }}
                   error={Boolean(fieldState.error)}
                   helperText={fieldState.error?.message}
                 />
@@ -148,7 +146,6 @@ const RegisterForm = ({
                   sx={{ mb: 3 }}
                   required
                   autoComplete="new-password"
-                  inputProps={{ minLength: 6 }}
                   error={Boolean(fieldState.error)}
                   helperText={fieldState.error?.message}
                 />
