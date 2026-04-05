@@ -8,7 +8,14 @@ export default function AppLayout() {
   const { isAuthenticated } = useAuth();
   console.log(isAuthenticated);
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        overflow: 'hidden',
+      }}
+    >
       <AppHeader />
       {isAuthenticated && (
         <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
@@ -19,9 +26,10 @@ export default function AppLayout() {
             tabIndex={-1}
             sx={{
               flex: 1,
-              overflow: 'auto',
-              p: 3,
+              display: 'flex',
+              flexDirection: 'column',
               minWidth: 0,
+              minHeight: 0,
             }}
           >
             <Outlet />

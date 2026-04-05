@@ -52,7 +52,7 @@ export default function CommentForm({
   return (
     <Box
       component="form"
-      onSubmit={() => handleSubmit(handleFormSubmit)}
+      onSubmit={handleSubmit(handleFormSubmit)}
       noValidate
       sx={{ mt: 1 }}
     >
