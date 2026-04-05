@@ -25,7 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -132,12 +131,10 @@ public class PostController {
             responseCode = "200",
             description = "Hot posts retrieved successfully"
     )
-    public ResponseEntity<List<PostResponse>> getHotPosts(
-            @RequestParam(defaultValue = "20") int limit
-    ) {
+    public ResponseEntity<Page<PostResponse>> getHotPosts(Pageable pageable) {
         UUID currentUserId = getOptionalUserId();
-        log.info("Retrieving hot posts, limit: {}", limit);
-        List<PostResponse> response = postService.getHotPosts(currentUserId, limit);
+        log.info("Retrieving hot posts, page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
+        Page<PostResponse> response = postService.getHotPosts(currentUserId, pageable);
         return ResponseEntity.ok(response);
     }
 

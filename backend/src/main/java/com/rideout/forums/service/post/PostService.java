@@ -13,7 +13,6 @@ import com.rideout.forums.repository.post.PostRepository;
 import com.rideout.forums.repository.user.UserRepository;
 import com.rideout.forums.repository.vote.VoteRepository;
 import com.rideout.forums.user.User;
-import com.rideout.forums.vote.Vote;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,9 +23,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.data.domain.PageImpl;
+
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -86,26 +89,24 @@ public class PostService {
     public Page<PostResponse> listPostsByForum(String forumSlug, UUID currentUserId, Pageable pageable) {
         Forum forum = forumRepository.findBySlug(forumSlug)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Forum not found: " + forumSlug));
-        return postRepository.findByForumIdOrderByCreatedAtDesc(forum.getId(), pageable)
-                .map(post -> enrichPost(post, currentUserId));
+        Page<Post> page = postRepository.findByForumIdOrderByCreatedAtDesc(forum.getId(), pageable);
+        return new PageImpl<>(enrichPosts(page.getContent(), currentUserId), pageable, page.getTotalElements());
     }
 
     @Transactional(readOnly = true)
     public Page<PostResponse> listPostsByForumAndStatus(String forumSlug, PostStatus status, UUID currentUserId, Pageable pageable) {
         Forum forum = forumRepository.findBySlug(forumSlug)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Forum not found: " + forumSlug));
-        return postRepository.findByForumIdAndStatusOrderByCreatedAtDesc(forum.getId(), status, pageable)
-                .map(post -> enrichPost(post, currentUserId));
+        Page<Post> page = postRepository.findByForumIdAndStatusOrderByCreatedAtDesc(forum.getId(), status, pageable);
+        return new PageImpl<>(enrichPosts(page.getContent(), currentUserId), pageable, page.getTotalElements());
     }
 
     @Transactional(readOnly = true)
     public Page<PostResponse> listPostsByAuthor(UUID authorId, UUID currentUserId, Pageable pageable) {
-        // Verify user exists
         userRepository.findById(authorId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + authorId));
-
-        return postRepository.findByAuthorIdOrderByCreatedAtDesc(authorId, pageable)
-                .map(post -> enrichPost(post, currentUserId));
+        Page<Post> page = postRepository.findByAuthorIdOrderByCreatedAtDesc(authorId, pageable);
+        return new PageImpl<>(enrichPosts(page.getContent(), currentUserId), pageable, page.getTotalElements());
     }
 
     public PostResponse updatePost(String slug, PostUpdateRequest request, UUID requestingUserId) {
@@ -181,33 +182,53 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostResponse> getHotPosts(UUID currentUserId, int limit) {
-        // Fetch recent posts and sort by score (upvotes - downvotes + commentCount)
-        Page<Post> recentPosts = postRepository.findAll(PageRequest.of(0, Math.max(limit * 3, 100)));
+    public Page<PostResponse> getHotPosts(UUID currentUserId, Pageable pageable) {
+        int fetchSize = Math.max((pageable.getPageNumber() + 1) * pageable.getPageSize() * 3, 100);
+        Page<Post> recentPosts = postRepository.findAll(PageRequest.of(0, fetchSize));
 
-        return recentPosts.getContent().stream()
-                .map(post -> enrichPost(post, currentUserId))
+        List<PostResponse> scored = enrichPosts(recentPosts.getContent(), currentUserId).stream()
                 .sorted(Comparator.comparingLong(
                         (PostResponse p) -> p.upvotes() - p.downvotes() + p.commentCount()
                 ).reversed())
-                .limit(limit)
                 .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), scored.size());
+        List<PostResponse> pageContent = start >= scored.size() ? List.of() : scored.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, scored.size());
     }
 
     private PostResponse enrichPost(Post post, UUID currentUserId) {
-        String postId = post.getId().toString();
-        long upvotes = voteRepository.countByTargetTypeAndTargetIdAndValue("POST", postId, 1);
-        long downvotes = voteRepository.countByTargetTypeAndTargetIdAndValue("POST", postId, -1);
-        long commentCount = commentRepository.countByPostId(post.getId());
+        return enrichPosts(List.of(post), currentUserId).getFirst();
+    }
 
-        Integer userVote = null;
-        if (currentUserId != null) {
-            userVote = voteRepository
-                    .findByUserIdAndTargetTypeAndTargetId(currentUserId, "POST", postId)
-                    .map(Vote::getValue)
-                    .orElse(null);
-        }
+    private List<PostResponse> enrichPosts(List<Post> posts, UUID currentUserId) {
+        if (posts.isEmpty()) return List.of();
 
-        return PostResponse.from(post, upvotes, downvotes, userVote, commentCount);
+        List<String> postIds = posts.stream().map(p -> p.getId().toString()).toList();
+        List<UUID> postUuids = posts.stream().map(Post::getId).toList();
+
+        Map<String, long[]> voteCounts = voteRepository.findVoteStatsByPostIds(postIds).stream()
+                .collect(Collectors.toMap(
+                        s -> s.postId(),
+                        s -> new long[]{s.upvotes(), s.downvotes()}
+                ));
+
+        Map<UUID, Long> commentCounts = commentRepository.countByPostIds(postUuids).stream()
+                .collect(Collectors.toMap(c -> c.postId(), c -> c.commentCount()));
+
+        Map<String, Integer> userVotes = currentUserId == null ? Map.of() :
+                voteRepository.findUserVotesByPostIds(currentUserId, postIds).stream()
+                        .collect(Collectors.toMap(v -> v.postId(), v -> v.voteValue()));
+
+        return posts.stream()
+                .map(post -> {
+                    String postId = post.getId().toString();
+                    long[] votes = voteCounts.getOrDefault(postId, new long[]{0, 0});
+                    long commentCount = commentCounts.getOrDefault(post.getId(), 0L);
+                    Integer userVote = userVotes.get(postId);
+                    return PostResponse.from(post, votes[0], votes[1], userVote, commentCount);
+                })
+                .toList();
     }
 }
