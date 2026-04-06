@@ -47,9 +47,6 @@ export default function ForumSidebar() {
           justifyContent: 'space-between',
         }}
       >
-        <Typography variant="subtitle2" component="h2">
-          Your Forums
-        </Typography>
         {isAdmin && (
           <Button
             size="small"

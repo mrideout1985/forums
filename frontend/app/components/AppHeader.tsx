@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
-import { AppBar, Button, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 import { useAuth } from '~/providers/AuthProvider';
+import SearchBar from '~/components/SearchBar';
 
 export default function AppHeader() {
   const { user, isAuthenticated, signOut } = useAuth();
@@ -20,13 +21,22 @@ export default function AppHeader() {
             component="a"
             href="/"
             sx={{
-              flexGrow: 1,
               textDecoration: 'none',
               color: 'inherit',
+              mr: 2,
+              flexShrink: 0,
             }}
           >
             Rideout Forums
           </Typography>
+          {isAuthenticated && (
+            <Box
+              sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}
+            >
+              <SearchBar />
+            </Box>
+          )}
+          {!isAuthenticated && <Box sx={{ flexGrow: 1 }} />}
           {isAuthenticated ? (
             <>
               <Typography variant="body2" sx={{ mr: 2 }}>
