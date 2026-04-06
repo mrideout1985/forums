@@ -4,6 +4,7 @@ import com.rideout.forums.forum.ForumCreateRequest;
 import com.rideout.forums.forum.ForumResponse;
 import com.rideout.forums.forum.ForumUpdateRequest;
 import com.rideout.forums.service.forum.ForumService;
+import com.rideout.forums.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,7 +19,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/forums")
@@ -59,7 +64,7 @@ public class ForumController {
     })
     public ResponseEntity<ForumResponse> getForum(@PathVariable String slug) {
         log.info("Retrieving forum: {}", slug);
-        ForumResponse response = forumService.getForum(slug);
+        ForumResponse response = forumService.getForum(slug, getCurrentUserIdOrNull());
         return ResponseEntity.ok(response);
     }
 
@@ -71,7 +76,7 @@ public class ForumController {
     )
     public ResponseEntity<Page<ForumResponse>> listForums(Pageable pageable) {
         log.info("Listing forums with pagination: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<ForumResponse> response = forumService.listForums(pageable);
+        Page<ForumResponse> response = forumService.listForums(pageable, getCurrentUserIdOrNull());
         return ResponseEntity.ok(response);
     }
 
@@ -108,5 +113,13 @@ public class ForumController {
         log.info("Deleting forum: {}", slug);
         forumService.deleteForum(slug);
         return ResponseEntity.noContent().build();
+    }
+
+    private UUID getCurrentUserIdOrNull() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof User user) {
+            return user.getId();
+        }
+        return null;
     }
 }

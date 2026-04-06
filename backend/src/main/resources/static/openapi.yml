@@ -225,6 +225,89 @@ paths:
         '403':
           description: Unauthorized - admin role required
 
+  /api/forums/joined:
+    get:
+      summary: List joined forums
+      description: Retrieve the forums the current user has joined
+      operationId: listJoinedForums
+      tags:
+        - Forum Membership
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Page number (0-indexed)
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 50
+          description: Page size
+      responses:
+        '200':
+          description: Joined forums retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedForumResponse'
+        '401':
+          description: Not authenticated
+
+  /api/forums/{slug}/membership:
+    post:
+      summary: Join a forum
+      description: Join a forum (authenticated users)
+      operationId: joinForum
+      tags:
+        - Forum Membership
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Forum slug
+      responses:
+        '200':
+          description: Successfully joined forum
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumResponse'
+        '401':
+          description: Not authenticated
+        '404':
+          description: Forum not found
+        '409':
+          description: Already a member
+
+    delete:
+      summary: Leave a forum
+      description: Leave a forum (authenticated users)
+      operationId: leaveForum
+      tags:
+        - Forum Membership
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Forum slug
+      responses:
+        '200':
+          description: Successfully left forum
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumResponse'
+        '401':
+          description: Not authenticated
+        '404':
+          description: Forum not found or not a member
+
   /api/posts:
     post:
       summary: Create a new post
@@ -658,6 +741,12 @@ components:
         description:
           type: string
           description: Forum description
+        joined:
+          type: boolean
+          description: Whether the current user has joined this forum
+        memberCount:
+          type: integer
+          description: Number of members in this forum
         createdAt:
           type: string
           format: date-time

@@ -3,6 +3,7 @@ package com.rideout.forums.config;
 import com.rideout.forums.auth.JwtProvider;
 import com.rideout.forums.controller.comment.CommentController;
 import com.rideout.forums.controller.forum.ForumController;
+import com.rideout.forums.controller.forum.ForumMembershipController;
 import com.rideout.forums.controller.post.PostController;
 import com.rideout.forums.controller.vote.VoteController;
 import com.rideout.forums.repository.role.RoleRepository;
@@ -58,6 +59,9 @@ class SecurityConfigTests {
 
     @MockitoBean
     private ForumController forumController;
+
+    @MockitoBean
+    private ForumMembershipController forumMembershipController;
 
     @MockitoBean
     private PostController postController;

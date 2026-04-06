@@ -5,6 +5,7 @@ import com.rideout.forums.forum.Forum;
 import com.rideout.forums.forum.ForumCreateRequest;
 import com.rideout.forums.forum.ForumResponse;
 import com.rideout.forums.forum.ForumUpdateRequest;
+import com.rideout.forums.repository.forum.ForumMemberRepository;
 import com.rideout.forums.repository.forum.ForumRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +16,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 public class ForumService {
     private final ForumRepository forumRepository;
+    private final ForumMemberRepository forumMemberRepository;
 
     public ForumResponse createForum(ForumCreateRequest request) {
         SlugValidator.validateSlug(request.slug());
@@ -41,16 +47,25 @@ public class ForumService {
     }
 
     @Transactional(readOnly = true)
-    public ForumResponse getForum(String slug) {
+    public ForumResponse getForum(String slug, UUID userId) {
         Forum forum = forumRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Forum not found: " + slug));
-        return ForumResponse.from(forum);
+        boolean joined = userId != null && forumMemberRepository.existsByUserIdAndForumId(userId, forum.getId());
+        long memberCount = forumMemberRepository.countByForumId(forum.getId());
+        return ForumResponse.from(forum, joined, memberCount);
     }
 
     @Transactional(readOnly = true)
-    public Page<ForumResponse> listForums(Pageable pageable) {
+    public Page<ForumResponse> listForums(Pageable pageable, UUID userId) {
+        Set<UUID> joinedIds = userId != null
+                ? forumMemberRepository.findForumIdsByUserId(userId)
+                : Collections.emptySet();
         return forumRepository.findAll(pageable)
-                .map(ForumResponse::from);
+                .map(forum -> ForumResponse.from(
+                        forum,
+                        joinedIds.contains(forum.getId()),
+                        forumMemberRepository.countByForumId(forum.getId())
+                ));
     }
 
     public ForumResponse updateForum(String slug, ForumUpdateRequest request) {

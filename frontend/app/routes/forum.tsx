@@ -4,6 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ContextHeader from '~/components/ContextHeader';
 import PostCard from '~/components/PostCard';
 import { useForum } from '~/hooks/api/useForums';
+import { useJoinForum, useLeaveForum } from '~/hooks/api/useForumMembership';
 import { usePostsByForum, useVoteOnPost } from '~/hooks/api/usePosts';
 import { useAuth } from '~/providers/AuthProvider';
 
@@ -22,6 +23,8 @@ export default function ForumView() {
     error,
   } = usePostsByForum(forumSlug!);
   const { mutate: vote } = useVoteOnPost();
+  const { mutate: join, isPending: isJoining } = useJoinForum();
+  const { mutate: leave, isPending: isLeaving } = useLeaveForum();
 
   const posts = postsData?.content ?? [];
 
@@ -44,13 +47,32 @@ export default function ForumView() {
         description={forum?.description}
         action={
           isAuthenticated ? (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => void navigate(`/forums/${forumSlug}/posts/new`)}
-            >
-              New Post
-            </Button>
+            <Stack direction="row" spacing={1}>
+              {forum?.joined ? (
+                <Button
+                  variant="outlined"
+                  disabled={isLeaving}
+                  onClick={() => leave({ slug: forumSlug! })}
+                >
+                  Leave
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  disabled={isJoining}
+                  onClick={() => join({ slug: forumSlug! })}
+                >
+                  Join
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => navigate(`/forums/${forumSlug}/posts/new`)}
+              >
+                New Post
+              </Button>
+            </Stack>
           ) : undefined
         }
       />

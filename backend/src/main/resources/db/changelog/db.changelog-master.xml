@@ -12,4 +12,5 @@
     <include file="db/changelog/0005-default-forums.xml"/>
     <include file="db/changelog/0006-comments.xml"/>
     <include file="db/changelog/0007-votes.xml"/>
+    <include file="db/changelog/0008-forum-members.xml"/>
 </databaseChangeLog>
