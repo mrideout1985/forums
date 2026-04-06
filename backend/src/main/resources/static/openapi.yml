@@ -129,6 +129,12 @@ paths:
       tags:
         - Forums
       parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional search query to filter forums by name (case-insensitive)
         - name: page
           in: query
           schema:

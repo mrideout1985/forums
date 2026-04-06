@@ -56,12 +56,14 @@ public class ForumService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ForumResponse> listForums(Pageable pageable, UUID userId) {
+    public Page<ForumResponse> listForums(Pageable pageable, UUID userId, String query) {
         Set<UUID> joinedIds = userId != null
                 ? forumMemberRepository.findForumIdsByUserId(userId)
                 : Collections.emptySet();
-        return forumRepository.findAll(pageable)
-                .map(forum -> ForumResponse.from(
+        Page<Forum> forums = (query != null && !query.isBlank())
+                ? forumRepository.findByNameContainingIgnoreCase(query.strip(), pageable)
+                : forumRepository.findAll(pageable);
+        return forums.map(forum -> ForumResponse.from(
                         forum,
                         joinedIds.contains(forum.getId()),
                         forumMemberRepository.countByForumId(forum.getId())

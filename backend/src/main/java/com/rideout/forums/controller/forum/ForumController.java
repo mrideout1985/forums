@@ -74,9 +74,12 @@ public class ForumController {
             responseCode = "200",
             description = "Forums retrieved successfully"
     )
-    public ResponseEntity<Page<ForumResponse>> listForums(Pageable pageable) {
-        log.info("Listing forums with pagination: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<ForumResponse> response = forumService.listForums(pageable, getCurrentUserIdOrNull());
+    public ResponseEntity<Page<ForumResponse>> listForums(
+            Pageable pageable,
+            @RequestParam(required = false) String q
+    ) {
+        log.info("Listing forums with pagination: page={}, size={}, q={}", pageable.getPageNumber(), pageable.getPageSize(), q);
+        Page<ForumResponse> response = forumService.listForums(pageable, getCurrentUserIdOrNull(), q);
         return ResponseEntity.ok(response);
     }
 
