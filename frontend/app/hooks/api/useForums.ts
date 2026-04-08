@@ -1,12 +1,22 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { ForumsApi } from '~/generated/apis/ForumsApi';
 import { useApi } from '~/hooks/useApi';
 
-export function useForums() {
+export function useForums({ size }: { size: number }) {
   const api = useApi(ForumsApi);
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['forums'],
-    queryFn: () => api.listForums({}),
+    queryFn: ({ pageParam }) =>
+      api.listForums({
+        page: pageParam,
+        size,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      const totalPages = lastPage.totalPages ?? 0;
+      const nextPage = allPages.length;
+      return nextPage < totalPages ? nextPage : undefined;
+    },
   });
 }
 

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -rf e2e)",
+      "Bash(mkdir -p e2e/tests)"
+    ]
+  }
+}
