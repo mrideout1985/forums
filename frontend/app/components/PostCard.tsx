@@ -10,16 +10,19 @@ import {
 import CommentIcon from '@mui/icons-material/ChatBubbleOutline';
 import type { PostResponseModel } from '~/generated/models/PostResponseModel';
 import VoteButtons from '~/components/VoteButtons';
-import { useAuth } from '~/providers/AuthProvider';
 
 interface PostCardProps {
   post: PostResponseModel;
   onVote: (postId: string, value: number) => void;
+  isAuthenticated: boolean;
 }
 
-export default function PostCard({ post, onVote }: PostCardProps) {
+export default function PostCard({
+  post,
+  onVote,
+  isAuthenticated,
+}: PostCardProps) {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
 
   return (
     <Card variant="outlined">

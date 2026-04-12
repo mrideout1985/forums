@@ -6,7 +6,6 @@ import { useAuth } from '~/providers/AuthProvider';
 
 export default function AppLayout() {
   const { isAuthenticated } = useAuth();
-  console.log(isAuthenticated);
   return (
     <Box
       sx={{

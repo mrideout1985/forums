@@ -48,6 +48,9 @@ frontend/build/
 # Environment files
 .env
 .env.local
+
+# Playwright auth state (contains session cookies)
+e2e/playwright/.auth/
 .env.*.local
 
 # OS-specific files

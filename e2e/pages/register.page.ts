@@ -10,6 +10,7 @@ export class RegisterPage {
   readonly submitButton: Locator;
   readonly errorAlert: Locator;
   readonly signInLink: Locator;
+  readonly logoutButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -21,6 +22,7 @@ export class RegisterPage {
     this.submitButton = page.getByRole('button', { name: 'Create account' });
     this.errorAlert = page.getByRole('alert');
     this.signInLink = page.getByRole('link', { name: 'Sign in' });
+    this.logoutButton = page.getByRole('button', { name: 'Sign out' });
   }
 
   async goto(): Promise<void> {

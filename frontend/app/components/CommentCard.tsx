@@ -3,7 +3,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import type { CommentResponseModel } from '~/generated/models/CommentResponseModel';
 import VoteButtons from '~/components/VoteButtons';
 import CommentForm from '~/components/CommentForm';
-import { useAuth } from '~/providers/AuthProvider';
 
 interface CommentCardProps {
   comment: CommentResponseModel;
@@ -11,6 +10,9 @@ interface CommentCardProps {
   onReply: (parentCommentId: number, body: string) => void;
   onDelete: (commentId: number) => void;
   isReplyPending?: boolean;
+  isAuthenticated: boolean;
+  isOwner: (comment: CommentResponseModel) => boolean;
+  isAdmin: boolean;
   depth?: number;
 }
 
@@ -20,11 +22,12 @@ export default function CommentCard({
   onReply,
   onDelete,
   isReplyPending = false,
+  isAuthenticated,
+  isOwner,
+  isAdmin,
   depth = 0,
 }: CommentCardProps) {
-  const { user, isAuthenticated } = useAuth();
-  const isOwner = user?.username === comment.author?.username;
-  const isAdmin = user?.roles?.includes('ROLE_ADMIN');
+  const canDelete = isOwner(comment) || isAdmin;
 
   return (
     <Box
@@ -53,7 +56,7 @@ export default function CommentCard({
                 ? new Date(comment.createdAt).toLocaleDateString()
                 : ''}
             </Typography>
-            {(isOwner || isAdmin) && (
+            {canDelete && (
               <IconButton
                 size="small"
                 onClick={() => onDelete(comment.id!)}
@@ -84,6 +87,9 @@ export default function CommentCard({
               onReply={onReply}
               onDelete={onDelete}
               isReplyPending={isReplyPending}
+              isAuthenticated={isAuthenticated}
+              isOwner={isOwner}
+              isAdmin={isAdmin}
               depth={depth + 1}
             />
           ))}

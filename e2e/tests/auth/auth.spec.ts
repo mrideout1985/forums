@@ -21,6 +21,7 @@ test.describe('User registration', () => {
     });
 
     await expect(page).toHaveURL('/');
+
   });
 
   test('existing user can log in', async ({ page }) => {
@@ -37,6 +38,7 @@ test.describe('User registration', () => {
     });
 
     await registerPage.signInLink.click();
+    await registerPage.logoutButton.click();
 
     await expect(page).toHaveURL('/login');
 
