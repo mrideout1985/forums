@@ -51,7 +51,7 @@ describe('Register', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', { name: 'Rideout Forums' })
+        screen.getByRole('heading', { name: 'Create account' })
       ).toBeInTheDocument();
     });
 

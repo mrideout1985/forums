@@ -1,17 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Alert,
   Box,
   Button,
-  Card,
-  CardContent,
   CircularProgress,
+  Divider,
+  IconButton,
+  InputAdornment,
   Link as MuiLink,
+  Stack,
   TextField,
   Typography,
 } from '@mui/material';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link } from 'react-router';
+import AuthLayout from '~/components/AuthLayout';
 import {
   type RegisterInput,
   registerSchema,
@@ -28,7 +33,10 @@ export default function RegisterForm({
   errorMessage,
   onSubmit,
 }: RegisterFormProps) {
-  const { control, handleSubmit } = useForm<RegisterInput>({
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { control, handleSubmit, setFocus } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -41,139 +49,163 @@ export default function RegisterForm({
   });
 
   const onFormSubmit: React.SubmitEventHandler = (event) => {
-    void handleSubmit((data) => {
-      onSubmit(data);
-    })(event);
+    void handleSubmit(
+      (data) => {
+        onSubmit(data);
+      },
+      (errors) => {
+        const firstError = Object.keys(errors)[0] as keyof RegisterInput;
+        setFocus(firstError);
+      }
+    )(event);
   };
 
+  const passwordAdornment = (
+    show: boolean,
+    toggle: React.Dispatch<React.SetStateAction<boolean>>
+  ) => (
+    <InputAdornment position="end">
+      <IconButton
+        aria-label={show ? 'Hide password' : 'Show password'}
+        onClick={() => toggle((v) => !v)}
+        edge="end"
+      >
+        {show ? <VisibilityOff /> : <Visibility />}
+      </IconButton>
+    </InputAdornment>
+  );
+
   return (
-    <Box
-      component="main"
-      id="maincontent"
-      tabIndex={-1}
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        bgcolor: 'grey.50',
-      }}
+    <AuthLayout
+      heading="Create account"
+      subtitle="Get started with Rideout Forums"
     >
-      <Card sx={{ width: '100%', maxWidth: 420, mx: 2 }}>
-        <CardContent sx={{ p: 4 }}>
-          <Typography component="h1" variant="h5" fontWeight={600} mb={1}>
-            Rideout Forums
-          </Typography>
-          <Typography variant="body2" color="text.secondary" mb={3}>
-            Create a new account
-          </Typography>
+      {errorMessage && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {errorMessage}
+        </Alert>
+      )}
 
-          {errorMessage && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {errorMessage}
-            </Alert>
-          )}
+      <Box component="form" noValidate onSubmit={onFormSubmit}>
+        <Stack spacing={2.5}>
+          <Controller
+            name="username"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Username"
+                name="username"
+                size="medium"
+                fullWidth
+                required
+                autoFocus
+                autoComplete="username"
+                slotProps={{ htmlInput: { 'aria-required': true } }}
+                error={Boolean(fieldState.error)}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
+          <Controller
+            name="email"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Email"
+                name="email"
+                type="email"
+                size="medium"
+                fullWidth
+                required
+                autoComplete="email"
+                slotProps={{ htmlInput: { 'aria-required': true } }}
+                error={Boolean(fieldState.error)}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
+          <Controller
+            name="password"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                size="medium"
+                fullWidth
+                required
+                autoComplete="new-password"
+                slotProps={{
+                  htmlInput: { 'aria-required': true },
+                  input: {
+                    endAdornment: passwordAdornment(
+                      showPassword,
+                      setShowPassword
+                    ),
+                  },
+                }}
+                error={Boolean(fieldState.error)}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
+          <Controller
+            name="confirmPassword"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Confirm password"
+                name="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                size="medium"
+                fullWidth
+                required
+                autoComplete="new-password"
+                slotProps={{
+                  htmlInput: { 'aria-required': true },
+                  input: {
+                    endAdornment: passwordAdornment(
+                      showConfirmPassword,
+                      setShowConfirmPassword
+                    ),
+                  },
+                }}
+                error={Boolean(fieldState.error)}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            size="large"
+            disabled={isPending}
+            aria-label={isPending ? 'Creating account, please wait' : undefined}
+            sx={{ py: 1.4 }}
+          >
+            {isPending ? (
+              <CircularProgress size={22} color="inherit" aria-hidden="true" />
+            ) : (
+              'Create account'
+            )}
+          </Button>
+        </Stack>
+      </Box>
 
-          <Box component="form" noValidate onSubmit={onFormSubmit}>
-            <Controller
-              name="username"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Username"
-                  name="username"
-                  fullWidth
-                  sx={{ mb: 2 }}
-                  required
-                  autoFocus
-                  autoComplete="username"
-                  error={Boolean(fieldState.error)}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="email"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Email"
-                  name="email"
-                  type="email"
-                  fullWidth
-                  sx={{ mb: 2 }}
-                  required
-                  autoComplete="email"
-                  error={Boolean(fieldState.error)}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="password"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Password"
-                  name="password"
-                  type="password"
-                  fullWidth
-                  sx={{ mb: 2 }}
-                  required
-                  autoComplete="new-password"
-                  error={Boolean(fieldState.error)}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Controller
-              name="confirmPassword"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Confirm password"
-                  name="confirmPassword"
-                  type="password"
-                  fullWidth
-                  sx={{ mb: 3 }}
-                  required
-                  autoComplete="new-password"
-                  error={Boolean(fieldState.error)}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              size="large"
-              disabled={isPending}
-            >
-              {isPending ? (
-                <CircularProgress
-                  size={22}
-                  color="inherit"
-                  aria-label="Creating account"
-                />
-              ) : (
-                'Create account'
-              )}
-            </Button>
-          </Box>
+      <Divider sx={{ my: 3 }} />
 
-          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-            Already have an account?{' '}
-            <MuiLink component={Link} to="/login">
-              Sign in
-            </MuiLink>
-          </Typography>
-        </CardContent>
-      </Card>
-    </Box>
+      <Typography variant="body2" align="center">
+        Already have an account?{' '}
+        <MuiLink component={Link} to="/login" fontWeight={500}>
+          Sign in
+        </MuiLink>
+      </Typography>
+    </AuthLayout>
   );
 }
