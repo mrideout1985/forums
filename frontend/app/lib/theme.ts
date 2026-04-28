@@ -343,7 +343,12 @@ export const theme = createTheme({
       defaultProps: { variant: 'outlined', size: 'small' },
     },
 
+    MuiInputLabel: {
+      defaultProps: { shrink: true },
+    },
+
     MuiOutlinedInput: {
+      defaultProps: { notched: true },
       styleOverrides: {
         root: {
           '&:hover .MuiOutlinedInput-notchedOutline': {

@@ -39,9 +39,17 @@ export default function NewPostForm({
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<NewPostFormData>({
     resolver: zodResolver(newPostSchema),
   });
+  const slugify = (value: string) =>
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // remove non-word chars
+      .replace(/\s+/g, '-') // spaces → hyphens
+      .replace(/-+/g, '-');
 
   return (
     <Box
@@ -59,6 +67,14 @@ export default function NewPostForm({
           error={!!errors.title}
           helperText={errors.title?.message}
           aria-invalid={!!errors.title}
+          onChange={(
+            event: React.ChangeEvent<
+              HTMLInputElement | HTMLTextAreaElement,
+              Element
+            >
+          ) => {
+            setValue('slug', slugify(event.target.value));
+          }}
         />
         <TextField
           {...register('slug')}

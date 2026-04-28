@@ -63,7 +63,6 @@ describe('NewPostForm', () => {
     );
 
     await user.type(screen.getByLabelText('Title *'), 'My Test Post');
-    await user.type(screen.getByLabelText('Slug *'), 'my-test-post');
     await user.type(screen.getByLabelText('Body *'), 'This is the body');
     await user.click(screen.getByRole('button', { name: 'Create Post' }));
 
@@ -98,6 +97,18 @@ describe('NewPostForm', () => {
     );
 
     expect(screen.getByRole('button', { name: 'Creating...' })).toBeDisabled();
+  });
+
+  it('should auto-generate slug from title', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <NewPostForm onSubmit={vi.fn()} onCancel={vi.fn()} isPending={false} />
+    );
+
+    await user.type(screen.getByLabelText('Title *'), 'My Test Post!');
+
+    expect(screen.getByLabelText('Slug *')).toHaveValue('my-test-post');
   });
 
   it('should show slug helper text when no error', () => {
