@@ -36,8 +36,15 @@ describe('PostDetail', () => {
       <PostDetail post={basePost} isAuthenticated={false} onVote={vi.fn()} />
     );
 
-    expect(screen.getByText(/r\/test-forum/)).toBeInTheDocument();
     expect(screen.getByText(/testuser/)).toBeInTheDocument();
+  });
+
+  it('should not render the forum name', () => {
+    render(
+      <PostDetail post={basePost} isAuthenticated={false} onVote={vi.fn()} />
+    );
+
+    expect(screen.queryByText(/r\/test-forum/)).not.toBeInTheDocument();
   });
 
   it('should render vote buttons with score', () => {

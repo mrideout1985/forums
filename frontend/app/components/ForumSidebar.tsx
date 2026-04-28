@@ -41,7 +41,6 @@ export default function ForumSidebar() {
     >
       <Box
         sx={{
-          p: 2,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',

@@ -31,7 +31,9 @@ describe('NewPostForm', () => {
       expect(screen.getByText('Title is required')).toBeInTheDocument();
     });
     expect(screen.getByText('Slug is required')).toBeInTheDocument();
-    expect(screen.getByText('Body is required')).toBeInTheDocument();
+    expect(
+      screen.getByText('Body must be at least 10 characters')
+    ).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 

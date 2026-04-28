@@ -2,11 +2,11 @@ import {
   Alert,
   Box,
   CircularProgress,
-  Divider,
+  Link as MuiLink,
   Stack,
   Typography,
 } from '@mui/material';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import CommentCard from '~/components/CommentCard';
 import CommentForm from '~/components/CommentForm';
 import PostDetail from '~/components/PostDetail';
@@ -21,7 +21,7 @@ import { usePost, useVoteOnPost } from '~/hooks/api/usePosts';
 import { useAuth } from '~/providers/AuthProvider';
 
 export default function PostPage() {
-  const { postSlug } = useParams();
+  const { forumSlug, postSlug } = useParams();
   const { user, isAuthenticated } = useAuth();
   const {
     data: post,
@@ -73,48 +73,111 @@ export default function PostPage() {
   const commentList = Array.isArray(comments) ? comments : [];
 
   return (
-    <>
-      <PostDetail
-        post={post}
-        isAuthenticated={isAuthenticated}
-        onVote={handlePostVote}
-      />
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        minHeight: 0,
+      }}
+    >
+      <Box
+        sx={{
+          flexShrink: 0,
+          p: { xs: 2, sm: 3 },
+          pb: 0,
+        }}
+      >
+        <Box sx={{ maxWidth: 800 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mb: 2, display: 'block' }}
+          >
+            <MuiLink
+              component={Link}
+              to={`/forums/${forumSlug ?? post.forumSlug}`}
+              color="inherit"
+              underline="hover"
+            >
+              r/{forumSlug ?? post.forumSlug}
+            </MuiLink>
+          </Typography>
 
-      <Divider sx={{ my: 3 }} />
-
-      <Typography component="h2" variant="h6" fontWeight={600} mb={2}>
-        Comments ({post.commentCount ?? 0})
-      </Typography>
-
-      {isAuthenticated && (
-        <Box sx={{ mb: 3 }}>
-          <CommentForm onSubmit={handleNewComment} isPending={commentPending} />
+          <PostDetail
+            post={post}
+            isAuthenticated={isAuthenticated}
+            onVote={handlePostVote}
+          />
         </Box>
-      )}
+      </Box>
 
-      {commentsLoading ? (
-        <CircularProgress aria-label="Loading comments" />
-      ) : (
-        <Stack spacing={2}>
-          {commentList.length === 0 ? (
-            <Typography color="text.secondary">No comments yet.</Typography>
-          ) : (
-            commentList.map((comment) => (
-              <CommentCard
-                key={comment.id}
-                comment={comment}
-                onVote={handleCommentVote}
-                onReply={handleReply}
-                onDelete={handleDeleteComment}
-                isReplyPending={commentPending}
-                isAuthenticated={isAuthenticated}
-                isOwner={isCommentOwner}
-                isAdmin={isAdmin}
+      <Box
+        sx={{
+          flexShrink: 0,
+          px: { xs: 2, sm: 3 },
+          pt: 3,
+          pb: 2,
+          borderTop: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <Box sx={{ maxWidth: 800 }}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography component="h2" variant="h6" fontWeight={600}>
+              Comments ({post.commentCount ?? 0})
+            </Typography>
+          </Stack>
+
+          {isAuthenticated && (
+            <Box sx={{ mt: 2 }}>
+              <CommentForm
+                onSubmit={handleNewComment}
+                isPending={commentPending}
               />
-            ))
+            </Box>
           )}
-        </Stack>
-      )}
-    </>
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          flex: 1,
+          overflow: 'auto',
+          px: { xs: 2, sm: 3 },
+          pb: { xs: 2, sm: 3 },
+        }}
+      >
+        <Box sx={{ maxWidth: 800 }}>
+          {commentsLoading ? (
+            <CircularProgress aria-label="Loading comments" />
+          ) : (
+            <Stack spacing={2} sx={{ pb: 4 }}>
+              {commentList.length === 0 ? (
+                <Typography color="text.secondary">No comments yet.</Typography>
+              ) : (
+                commentList.map((comment) => (
+                  <CommentCard
+                    key={comment.id}
+                    comment={comment}
+                    onVote={handleCommentVote}
+                    onReply={handleReply}
+                    onDelete={handleDeleteComment}
+                    isReplyPending={commentPending}
+                    isAuthenticated={isAuthenticated}
+                    isOwner={isCommentOwner}
+                    isAdmin={isAdmin}
+                  />
+                ))
+              )}
+            </Stack>
+          )}
+        </Box>
+      </Box>
+    </Box>
   );
 }

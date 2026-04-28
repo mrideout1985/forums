@@ -18,7 +18,7 @@ const newPostSchema = z.object({
     ),
   body: z
     .string()
-    .min(1, 'Body is required')
+    .min(10, 'Body must be at least 10 characters')
     .max(50000, 'Body must not exceed 50000 characters'),
 });
 
