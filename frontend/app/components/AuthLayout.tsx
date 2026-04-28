@@ -3,8 +3,13 @@ import {
   Card,
   CardContent,
   Link as MuiLink,
+  Stack,
   Typography,
 } from '@mui/material';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import type { ReactNode } from 'react';
 
 interface AuthLayoutProps {
@@ -12,6 +17,16 @@ interface AuthLayoutProps {
   heading: string;
   subtitle: string;
 }
+
+const features = [
+  {
+    icon: <ChatBubbleOutlineIcon />,
+    text: 'Join a community of like-minded people',
+  },
+  { icon: <MenuBookIcon />, text: 'Share knowledge and ideas' },
+  { icon: <ForumOutlinedIcon />, text: 'Discuss topics you love' },
+  { icon: <GroupOutlinedIcon />, text: 'Make connections that last' },
+];
 
 export default function AuthLayout({
   children,
@@ -47,70 +62,85 @@ export default function AuthLayout({
           minHeight: '100vh',
         }}
       >
-        {/* ── Branding panel (hidden on small screens) ── */}
         <Box
           sx={{
             display: { xs: 'none', md: 'flex' },
             flexDirection: 'column',
             justifyContent: 'center',
-            alignItems: 'center',
             flex: '0 0 45%',
             background: (t) =>
               `linear-gradient(145deg, ${t.palette.primary.main} 0%, ${t.palette.secondary.main} 100%)`,
             color: '#ffffff',
-            px: 6,
+            px: { md: 6, lg: 8 },
             position: 'relative',
             overflow: 'hidden',
           }}
           aria-hidden="true"
         >
-          {/* Decorative circles */}
+          {/* Subtle background pattern */}
           <Box
             sx={{
               position: 'absolute',
-              width: 340,
-              height: 340,
-              borderRadius: '50%',
-              border: '1px solid rgba(255,255,255,0.22)',
-              top: -60,
-              left: -80,
-            }}
-          />
-          <Box
-            sx={{
-              position: 'absolute',
-              width: 220,
-              height: 220,
-              borderRadius: '50%',
-              border: '1px solid rgba(255,255,255,0.18)',
-              bottom: 80,
-              right: -40,
+              inset: 0,
+              opacity: 0.06,
+              backgroundImage:
+                'radial-gradient(circle at 25% 25%, #fff 1px, transparent 1px), radial-gradient(circle at 75% 75%, #fff 1px, transparent 1px)',
+              backgroundSize: '32px 32px',
             }}
           />
 
-          <Typography
-            variant="h2"
-            fontWeight={700}
-            sx={{ mb: 2, textAlign: 'center', position: 'relative' }}
-          >
-            Rideout Forums
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              opacity: 0.85,
-              maxWidth: 320,
-              textAlign: 'center',
-              lineHeight: 1.7,
-              position: 'relative',
-            }}
-          >
-            Join the conversation. Share ideas, ask questions, and connect with
-            like-minded people.
-          </Typography>
+          <Box sx={{ position: 'relative', maxWidth: 400 }}>
+            <Typography
+              variant="overline"
+              sx={{ opacity: 0.7, letterSpacing: 3 }}
+            >
+              Welcome to
+            </Typography>
+            <Typography
+              variant="h2"
+              fontWeight={700}
+              sx={{ mb: 1, lineHeight: 1.1 }}
+            >
+              Rideout Forums
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{ opacity: 0.8, mb: 5, lineHeight: 1.7 }}
+            >
+              Your space to discuss, learn, and connect.
+            </Typography>
+
+            <Stack spacing={3}>
+              {features.map((feature) => (
+                <Stack
+                  key={feature.text}
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 40,
+                      height: 40,
+                      borderRadius: 2,
+                      bgcolor: 'rgba(255,255,255,0.12)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {feature.icon}
+                  </Box>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    {feature.text}
+                  </Typography>
+                </Stack>
+              ))}
+            </Stack>
+          </Box>
         </Box>
 
-        {/* ── Form panel ── */}
         <Box
           sx={{
             flex: 1,
@@ -134,7 +164,6 @@ export default function AuthLayout({
             }}
           >
             <CardContent sx={{ p: { xs: 3, sm: 5 } }}>
-              {/* Mobile-only brand name */}
               <Typography
                 variant="overline"
                 color="primary"
